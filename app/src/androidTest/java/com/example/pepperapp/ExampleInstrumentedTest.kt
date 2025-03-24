@@ -1,4 +1,4 @@
-package com.example.pepperrobot_ai_assistant
+package com.example.pepperapp
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
