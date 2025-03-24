@@ -1,0 +1,24 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url 'https://qisdk.softbankrobotics.com/sdk/maven'
+        }
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS) // Permet d'utiliser les dépôts du settings.gradle
+
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url 'https://qisdk.softbankrobotics.com/sdk/maven'
+        }
+    }
+}
+
+rootProject.name = "pepperRobot-AI-assistant"
+include ':app'
