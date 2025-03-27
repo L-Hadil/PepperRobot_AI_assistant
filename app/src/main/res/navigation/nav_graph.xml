@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <!-- HomeFragment -->
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.pepperapp.ui.Fragments.HomeFragment"
+        android:label="Accueil"
+        tools:layout="@layout/fragment_home">
+
+        <!-- Go to profile creation -->
+        <action
+            android:id="@+id/action_homeFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+
+        <!-- Go to face recognition -->
+        <action
+            android:id="@+id/action_homeFragment_to_recognitionFragment"
+            app:destination="@id/recognitionFragment" />
+    </fragment>
+
+    <!-- FaceRecognitionFragment -->
+    <fragment
+        android:id="@+id/recognitionFragment"
+        android:name="com.example.pepperapp.ui.Fragments.FaceRecognitionFragment"
+        android:label="Reconnaissance"
+        tools:layout="@layout/face_recognition">
+
+        <!-- Recognition failed → create profile -->
+        <action
+            android:id="@+id/action_recognitionFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+
+    <!-- ProfileFragment -->
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.pepperapp.ui.Fragments.ProfileFragment"
+        android:label="Création de Profil"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_recognitionFragment"
+            app:destination="@id/recognitionFragment" />
+    </fragment>
+
+
+</navigation>

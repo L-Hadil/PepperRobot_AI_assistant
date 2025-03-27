@@ -58,6 +58,9 @@ dependencies {
     kapt "androidx.room:room-compiler:2.4.2"
     implementation "androidx.room:room-ktx:2.4.2"
 
+    //ml kit
+    implementation 'com.google.mlkit:face-detection:16.1.5'
+
 // ViewModel + LiveData
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.4.1"

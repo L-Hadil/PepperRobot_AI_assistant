@@ -8,7 +8,6 @@ data class UserProfile(
     @PrimaryKey val id: String,
     val name: String,
     val age: Int,
-    val job: String,
     val photoBase64: String,
     val threadId: String
 )
