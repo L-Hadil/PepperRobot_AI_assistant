@@ -1,4 +1,4 @@
-package com.example.pepperrobot_ai_assistant.data
+package com.example.pepperapp.data
 
 import com.example.pepperapp.data.UserProfileDao
 import com.example.pepperapp.model.UserProfile
@@ -11,9 +11,10 @@ class UserRepository(private val userProfileDao: UserProfileDao) {
         userProfileDao.insert(profile)
     }
 
-    suspend fun getProfileById(id: String): UserProfile? = withContext(Dispatchers.IO) {
+    suspend fun getProfileById(id: Int): UserProfile? = withContext(Dispatchers.IO) {
         userProfileDao.getById(id)
     }
+
 
     suspend fun getAllProfiles(): List<UserProfile> = withContext(Dispatchers.IO) {
         userProfileDao.getAll()

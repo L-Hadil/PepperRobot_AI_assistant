@@ -5,9 +5,12 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "user_profiles")
 data class UserProfile(
-    @PrimaryKey val id: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+
     val name: String,
     val age: Int,
     val photoBase64: String,
-    val threadId: String
+
+    val threadId: String? = null // nullable, valeur par défaut null
 )

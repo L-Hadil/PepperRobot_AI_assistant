@@ -7,7 +7,7 @@ import com.aldebaran.qi.sdk.QiContext
 import com.aldebaran.qi.sdk.QiSDK
 import com.aldebaran.qi.sdk.RobotLifecycleCallbacks
 import com.example.pepperapp.ui.Fragments.ProfileFragment
-import com.example.pepperrobot_ai_assistant.R
+import com.example.pepperapp.R
 
 class MainActivity : AppCompatActivity(), RobotLifecycleCallbacks {
 

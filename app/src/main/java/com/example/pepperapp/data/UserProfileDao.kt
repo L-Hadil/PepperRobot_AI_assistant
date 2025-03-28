@@ -20,4 +20,8 @@ interface UserProfileDao {
 
     @Query("DELETE FROM user_profiles")
     suspend fun clearAll()
+
+    @Query("SELECT * FROM user_profiles WHERE id = :id")
+    suspend fun getById(id: Int): UserProfile?
+
 }

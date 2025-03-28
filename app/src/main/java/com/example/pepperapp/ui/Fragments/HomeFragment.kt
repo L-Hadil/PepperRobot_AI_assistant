@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.aldebaran.qi.sdk.QiContext
 import com.example.pepperapp.utils.SharedBitmapHolder
-import com.example.pepperrobot_ai_assistant.R
+import com.example.pepperapp.R
 
 class HomeFragment : Fragment() {
 
