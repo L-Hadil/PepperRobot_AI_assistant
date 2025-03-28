@@ -129,6 +129,7 @@ class ProfileFragment : Fragment() {
             requireActivity().runOnUiThread {
                 Toast.makeText(requireContext(), "Profil enregistré avec succès !", Toast.LENGTH_SHORT).show()
                 // Optionnel : retournez à un autre écran ou réinitialisez le formulaire
+
             }
         }
     }
