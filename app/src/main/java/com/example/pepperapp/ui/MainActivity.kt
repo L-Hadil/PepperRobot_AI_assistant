@@ -7,6 +7,7 @@ import com.aldebaran.qi.sdk.QiContext
 import com.aldebaran.qi.sdk.QiSDK
 import com.aldebaran.qi.sdk.RobotLifecycleCallbacks
 import com.example.pepperapp.ui.Fragments.ProfileFragment
+import com.example.pepperapp.ui.Fragments.StartFragment
 import com.example.pepperapp.R
 
 class MainActivity : AppCompatActivity(), RobotLifecycleCallbacks {
@@ -15,15 +16,14 @@ class MainActivity : AppCompatActivity(), RobotLifecycleCallbacks {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Utilisation d'un simple container pour charger le fragment
         setContentView(R.layout.activity_main)
-        // Charge ProfileFragment au démarrage
+
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, ProfileFragment())
+                .replace(R.id.container, StartFragment())
                 .commit()
         }
-        // Enregistrement auprès de QiSDK pour obtenir le QiContext
+
         QiSDK.register(this, this)
     }
 
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity(), RobotLifecycleCallbacks {
 
     override fun onRobotFocusGained(qiContext: QiContext) {
         this.qiContext = qiContext
-        // Transmet le QiContext au ProfileFragment
+
         val fragment = supportFragmentManager.findFragmentById(R.id.container)
         if (fragment is ProfileFragment) {
             fragment.setQiContext(qiContext)
@@ -48,4 +48,6 @@ class MainActivity : AppCompatActivity(), RobotLifecycleCallbacks {
     override fun onRobotFocusRefused(reason: String?) {
         Toast.makeText(this, "Focus refusé : $reason", Toast.LENGTH_LONG).show()
     }
+
+    fun getQiContext(): QiContext? = qiContext
 }

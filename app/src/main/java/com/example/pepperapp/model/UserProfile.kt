@@ -12,5 +12,6 @@ data class UserProfile(
     val age: Int,
     val photoBase64: String,
 
-    val threadId: String? = null // nullable, valeur par défaut null
+    val threadIdAzure: String? = null ,
+    val threadIdGPT: String? = null
 )

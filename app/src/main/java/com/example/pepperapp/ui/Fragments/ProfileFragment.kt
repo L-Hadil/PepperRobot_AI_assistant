@@ -1,5 +1,6 @@
 package com.example.pepperapp.ui.Fragments
 
+import android.content.pm.PackageManager
 import android.graphics.*
 import android.os.Bundle
 import android.util.Log
@@ -8,24 +9,30 @@ import android.widget.*
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.aldebaran.qi.sdk.QiContext
 import com.example.pepperapp.R
 import com.example.pepperapp.data.PepperDatabase
 import com.example.pepperapp.model.UserProfile
+import com.example.pepperapp.utils.AzureFaceApiHelper
 import com.example.pepperapp.utils.toBase64
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.io.ByteArrayOutputStream
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class ProfileFragment : Fragment() {
+
+    private var qiContext: QiContext? = null
+    fun setQiContext(qiContext: QiContext) {
+        this.qiContext = qiContext
+    }
 
     private lateinit var previewView: PreviewView
     private lateinit var imgFacePreview: ImageView
@@ -53,11 +60,8 @@ class ProfileFragment : Fragment() {
         btnSave = view.findViewById(R.id.btnSaveProfile)
 
         btnTakePhoto.setOnClickListener {
-            if (!photoTaken) {
-                capturePhoto()
-            } else {
-                Toast.makeText(requireContext(), "Photo déjà prise. Recharge la page pour en reprendre une.", Toast.LENGTH_SHORT).show()
-            }
+            if (!photoTaken) capturePhoto()
+            else Toast.makeText(requireContext(), "Photo déjà prise.", Toast.LENGTH_SHORT).show()
         }
 
         btnSave.setOnClickListener {
@@ -72,7 +76,14 @@ class ProfileFragment : Fragment() {
         super.onResume()
         photoTaken = false
         capturedFaceBitmap = null
-        startCamera()
+
+        if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            startCamera()
+        } else {
+            requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 101)
+        }
     }
 
     override fun onDestroy() {
@@ -80,9 +91,19 @@ class ProfileFragment : Fragment() {
         cameraExecutor.shutdown()
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 101 && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
+            startCamera()
+        } else {
+            Toast.makeText(requireContext(), "Permission caméra refusée", Toast.LENGTH_LONG).show()
+        }
+    }
+
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-
         cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
 
@@ -91,7 +112,6 @@ class ProfileFragment : Fragment() {
             }
 
             imageCapture = ImageCapture.Builder().build()
-
             val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
 
             try {
@@ -103,9 +123,8 @@ class ProfileFragment : Fragment() {
                     imageCapture
                 )
             } catch (exc: Exception) {
-                Log.e("CameraX", "Use case binding failed", exc)
+                Log.e("CameraX", "Camera init failed", exc)
             }
-
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
@@ -116,8 +135,7 @@ class ProfileFragment : Fragment() {
                 override fun onCaptureSuccess(imageProxy: ImageProxy) {
                     val bitmap = imageProxyToBitmap(imageProxy)
                     imageProxy.close()
-                    detectAndCropFace(bitmap)
-                    photoTaken = true
+                    detectFacePresence(bitmap)
                 }
 
                 override fun onError(exception: ImageCaptureException) {
@@ -126,16 +144,8 @@ class ProfileFragment : Fragment() {
             })
     }
 
-    private fun imageProxyToBitmap(imageProxy: ImageProxy): Bitmap {
-        val planeProxy = imageProxy.planes[0]
-        val buffer = planeProxy.buffer
-        val bytes = ByteArray(buffer.remaining())
-        buffer.get(bytes)
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-    }
-
-    private fun detectAndCropFace(originalBitmap: Bitmap) {
-        val image = InputImage.fromBitmap(originalBitmap, 0)
+    private fun detectFacePresence(bitmap: Bitmap) {
+        val image = InputImage.fromBitmap(bitmap, 0)
         val detector = FaceDetection.getClient(
             FaceDetectorOptions.Builder()
                 .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
@@ -145,54 +155,60 @@ class ProfileFragment : Fragment() {
         detector.process(image)
             .addOnSuccessListener { faces ->
                 if (faces.isNotEmpty()) {
-                    val faceBox = faces[0].boundingBox
-                    val safeBox = Rect(
-                        faceBox.left.coerceAtLeast(0),
-                        faceBox.top.coerceAtLeast(0),
-                        faceBox.right.coerceAtMost(originalBitmap.width),
-                        faceBox.bottom.coerceAtMost(originalBitmap.height)
-                    )
-                    val faceBitmap = Bitmap.createBitmap(
-                        originalBitmap,
-                        safeBox.left,
-                        safeBox.top,
-                        safeBox.width(),
-                        safeBox.height()
-                    )
-                    capturedFaceBitmap = faceBitmap
-                    imgFacePreview.setImageBitmap(faceBitmap)
+                    capturedFaceBitmap = bitmap
+                    imgFacePreview.setImageBitmap(bitmap)
+                    photoTaken = true
                 } else {
                     Toast.makeText(requireContext(), "Aucun visage détecté", Toast.LENGTH_SHORT).show()
                 }
             }
             .addOnFailureListener {
-                Toast.makeText(requireContext(), "Erreur de détection de visage", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Erreur détection visage", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun imageProxyToBitmap(imageProxy: ImageProxy): Bitmap {
+        val buffer = imageProxy.planes[0].buffer
+        val bytes = ByteArray(buffer.remaining())
+        buffer.get(bytes)
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
     }
 
     private fun saveProfile() {
         val name = inputName.text.toString().trim()
         val age = inputAge.text.toString().trim().toIntOrNull()
-        val photoBase64 = capturedFaceBitmap?.toBase64() ?: ""
+        val photo = capturedFaceBitmap ?: return Toast.makeText(requireContext(), "Photo requise", Toast.LENGTH_SHORT).show()
 
         if (name.isEmpty() || age == null) {
-            Toast.makeText(requireContext(), "Nom et âge sont requis.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Nom et âge requis", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val user = UserProfile(
-            name = name,
-            age = age,
-            photoBase64 = photoBase64,
-            threadId = null // à remplir plus tard
-        )
+        val photoBase64 = photo.toBase64()
 
         lifecycleScope.launch {
-            val db = PepperDatabase.getDatabase(requireContext())
-            db.userProfileDao().insert(user)
+            try {
+                val personId = AzureFaceApiHelper.createPerson(name)
+                val faceAdded = AzureFaceApiHelper.addFaceToPerson(personId, photo)
+                AzureFaceApiHelper.trainPersonGroup()
 
-            withContext(Dispatchers.Main) {
-                Toast.makeText(requireContext(), "Profil enregistré avec succès !", Toast.LENGTH_SHORT).show()
+                val user = UserProfile(
+                    name = name,
+                    age = age,
+                    photoBase64 = photoBase64,
+                    threadIdAzure = personId
+                )
+
+                val db = PepperDatabase.getDatabase(requireContext())
+                db.userProfileDao().insert(user)
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "Profil enregistré avec Azure !", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "Erreur Azure: ${e.message}", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }

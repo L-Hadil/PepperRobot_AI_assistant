@@ -8,6 +8,8 @@ pluginManagement {
     }
 }
 
+
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS) // Permet d'utiliser les dépôts du settings.gradle
 

@@ -23,5 +23,7 @@ interface UserProfileDao {
 
     @Query("SELECT * FROM user_profiles WHERE id = :id")
     suspend fun getById(id: Int): UserProfile?
+    @Query("SELECT * FROM user_profiles WHERE name = :name LIMIT 1")
+    suspend fun getUserByName(name: String): UserProfile?
 
 }
