@@ -30,8 +30,6 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
     // Attention : en production, gérez la clé API de manière sécurisée.
     private val apiKey = "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"
 
-
-
     private val client = OkHttpClient()
 
     private lateinit var messageContainer: LinearLayout
@@ -40,8 +38,6 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
     private lateinit var sendButton: Button
 
     private var latestQuestion: String = ""
-    // threadIdGPT correspond à celui créé initialement. Après le lancement d'un run,
-    // nous mettrons à jour ce threadId avec celui renvoyé par l'API via la réponse du run.
     private var threadIdGPT = ""
 
     private val storyParagraphs = listOf(
@@ -52,9 +48,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         "Un jour, Maître Hibou lui dit : 'Tu dois apprendre à te calmer, Loup. Nous allons t’aider !'"
     )
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_chat, container, false)
         QiSDK.register(requireActivity(), this)
 
@@ -196,7 +190,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         super.onDestroyView()
     }
 
-    // Création du thread OpenAI
+    // Crée un nouveau thread côté OpenAI
     private suspend fun createThreadOnOpenAI(): String = withContext(Dispatchers.IO) {
         val req = Request.Builder()
             .url("https://api.openai.com/v1/threads")
@@ -216,9 +210,9 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         threadId
     }
 
-    // Envoie la question et démarre un run puis effectue le polling avec le bon thread_id
+    // Envoie la question, démarre un run et effectue le polling avec le bon thread_id.
     private suspend fun sendToGPT(threadId: String, message: String): String = withContext(Dispatchers.IO) {
-        // 1) Poste la question dans le thread
+        // 1) Poste la question dans le thread.
         val msgObject = JSONObject().apply {
             put("role", "user")
             put("content", message)
@@ -250,10 +244,9 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
 
         val runJson = JSONObject(runBody ?: "{}")
         val runId = runJson.optString("id", "")
-        // On récupère le thread_id renvoyé par le run
+        // Récupère le nouveau thread_id (le cas échéant) fourni par la réponse du run.
         val newThreadId = runJson.optString("thread_id", "")
         if (newThreadId.isNotEmpty()) {
-            // Met à jour le threadId à utiliser dans les appels suivants
             Log.d(TAG, "Mise à jour du threadId: $newThreadId")
         }
         val effectiveThreadId = if (newThreadId.isNotEmpty()) newThreadId else threadId
@@ -262,7 +255,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
             return@withContext "Échec du run : Aucune 'id' dans la réponse."
         }
 
-        // 3) Poll tant que le statut n'est pas "completed" ou pendant 30 itérations
+        // 3) Poll tant que le statut n'est pas "completed" ou pendant 30 itérations.
         repeat(30) {
             delay(1000)
             val check = client.newCall(
@@ -283,7 +276,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         "Je n’ai pas reçu de réponse."
     }
 
-    // Récupère la dernière réponse du format texte
+    // Récupère la dernière réponse en format texte.
     private suspend fun fetchLastResponse(threadId: String): String = withContext(Dispatchers.IO) {
         val resp = client.newCall(
             Request.Builder()
@@ -299,14 +292,22 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         for (i in 0 until data.length()) {
             val msg = data.getJSONObject(i)
             if (msg.optString("role") == "assistant") {
-                // Nouveau format "text" : on parcourt le tableau "content"
                 val contents = msg.optJSONArray("content") ?: continue
                 for (j in 0 until contents.length()) {
                     val contentObj = contents.getJSONObject(j)
                     if (contentObj.optString("type") == "text") {
-                        val textResponse = contentObj.optString("text", "")
-                        if (textResponse.isNotEmpty()) {
-                            return@withContext textResponse
+                        // Modification ici : on extrait le contenu depuis l'objet "text" sous la clé "value"
+                        val textObj = contentObj.optJSONObject("text")
+                        if (textObj != null) {
+                            val value = textObj.optString("value", "")
+                            if (value.isNotEmpty()) {
+                                return@withContext value
+                            }
+                        } else {
+                            val directText = contentObj.optString("text", "")
+                            if (directText.isNotEmpty()) {
+                                return@withContext directText
+                            }
                         }
                     }
                 }
