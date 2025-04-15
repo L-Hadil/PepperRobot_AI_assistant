@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chatContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!-- Titre -->
+    <TextView
+        android:id="@+id/chatTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="L’histoire de Loup 🐺"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:textColor="#333333"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Zone de messages -->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:overScrollMode="always">
+
+        <LinearLayout
+            android:id="@+id/messageContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="16dp" />
+    </ScrollView>
+
+    <!-- Bouton : poser une question -->
+    <Button
+        android:id="@+id/buttonAskQuestion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🎤 Poser une question"
+        android:layout_marginTop="8dp"
+        android:visibility="visible" />
+
+    <!-- Bouton : faire répondre Pepper -->
+    <Button
+        android:id="@+id/buttonAnswer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Répondre à ma question"
+        android:layout_marginTop="8dp"
+        android:visibility="visible" />
+</LinearLayout>

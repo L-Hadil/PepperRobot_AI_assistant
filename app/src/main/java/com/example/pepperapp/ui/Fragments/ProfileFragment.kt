@@ -1,7 +1,8 @@
 package com.example.pepperapp.ui.Fragments
 
 import android.content.pm.PackageManager
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -23,7 +24,6 @@ import com.google.mlkit.vision.face.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -32,6 +32,7 @@ class ProfileFragment : Fragment() {
     private var qiContext: QiContext? = null
     fun setQiContext(qiContext: QiContext) {
         this.qiContext = qiContext
+        Log.d("ProfileFragment", "QiContext initialisé")
     }
 
     private lateinit var previewView: PreviewView
@@ -50,6 +51,7 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.d("ProfileFragment", "onCreateView appelé")
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
         previewView = view.findViewById(R.id.previewView)
@@ -60,11 +62,17 @@ class ProfileFragment : Fragment() {
         btnSave = view.findViewById(R.id.btnSaveProfile)
 
         btnTakePhoto.setOnClickListener {
-            if (!photoTaken) capturePhoto()
-            else Toast.makeText(requireContext(), "Photo déjà prise.", Toast.LENGTH_SHORT).show()
+            Log.d("ProfileFragment", "Bouton 'Prendre Photo' cliqué")
+            if (!photoTaken) {
+                capturePhoto()
+            } else {
+                Toast.makeText(requireContext(), "Photo déjà prise.", Toast.LENGTH_SHORT).show()
+                Log.d("ProfileFragment", "Tentative de capture alors qu'une photo a déjà été prise")
+            }
         }
 
         btnSave.setOnClickListener {
+            Log.d("ProfileFragment", "Bouton 'Sauvegarder' cliqué")
             saveProfile()
         }
 
@@ -74,20 +82,24 @@ class ProfileFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        Log.d("ProfileFragment", "onResume appelé")
         photoTaken = false
         capturedFaceBitmap = null
 
         if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_GRANTED
         ) {
+            Log.d("ProfileFragment", "Permission caméra déjà accordée")
             startCamera()
         } else {
+            Log.d("ProfileFragment", "Demande de permission caméra")
             requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 101)
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d("ProfileFragment", "onDestroy appelé, arrêt du cameraExecutor")
         cameraExecutor.shutdown()
     }
 
@@ -96,25 +108,28 @@ class ProfileFragment : Fragment() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 101 && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
+            Log.d("ProfileFragment", "Permission caméra accordée")
             startCamera()
         } else {
+            Log.d("ProfileFragment", "Permission caméra refusée")
             Toast.makeText(requireContext(), "Permission caméra refusée", Toast.LENGTH_LONG).show()
         }
     }
 
     private fun startCamera() {
+        Log.d("ProfileFragment", "Initialisation de la caméra")
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
-
-            val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(previewView.surfaceProvider)
-            }
-
-            imageCapture = ImageCapture.Builder().build()
-            val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-
             try {
+                val cameraProvider = cameraProviderFuture.get()
+
+                val preview = Preview.Builder().build().also {
+                    it.setSurfaceProvider(previewView.surfaceProvider)
+                }
+
+                imageCapture = ImageCapture.Builder().build()
+                val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(
                     viewLifecycleOwner,
@@ -122,29 +137,34 @@ class ProfileFragment : Fragment() {
                     preview,
                     imageCapture
                 )
+                Log.d("ProfileFragment", "Caméra démarrée avec succès")
             } catch (exc: Exception) {
-                Log.e("CameraX", "Camera init failed", exc)
+                Log.e("ProfileFragment", "Échec de l'initialisation de la caméra", exc)
             }
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
     private fun capturePhoto() {
+        Log.d("ProfileFragment", "Début de la capture photo")
         imageCapture.takePicture(
             ContextCompat.getMainExecutor(requireContext()),
             object : ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(imageProxy: ImageProxy) {
+                    Log.d("ProfileFragment", "Capture photo réussie")
                     val bitmap = imageProxyToBitmap(imageProxy)
                     imageProxy.close()
                     detectFacePresence(bitmap)
                 }
 
                 override fun onError(exception: ImageCaptureException) {
+                    Log.e("ProfileFragment", "Erreur de capture photo", exception)
                     Toast.makeText(requireContext(), "Erreur de capture", Toast.LENGTH_SHORT).show()
                 }
             })
     }
 
     private fun detectFacePresence(bitmap: Bitmap) {
+        Log.d("ProfileFragment", "Début de la détection de visage")
         val image = InputImage.fromBitmap(bitmap, 0)
         val detector = FaceDetection.getClient(
             FaceDetectorOptions.Builder()
@@ -155,19 +175,23 @@ class ProfileFragment : Fragment() {
         detector.process(image)
             .addOnSuccessListener { faces ->
                 if (faces.isNotEmpty()) {
+                    Log.d("ProfileFragment", "Visage détecté, nombre de visages : ${faces.size}")
                     capturedFaceBitmap = bitmap
                     imgFacePreview.setImageBitmap(bitmap)
                     photoTaken = true
                 } else {
+                    Log.d("ProfileFragment", "Aucun visage détecté")
                     Toast.makeText(requireContext(), "Aucun visage détecté", Toast.LENGTH_SHORT).show()
                 }
             }
-            .addOnFailureListener {
+            .addOnFailureListener { e ->
+                Log.e("ProfileFragment", "Erreur lors de la détection de visage", e)
                 Toast.makeText(requireContext(), "Erreur détection visage", Toast.LENGTH_SHORT).show()
             }
     }
 
     private fun imageProxyToBitmap(imageProxy: ImageProxy): Bitmap {
+        Log.d("ProfileFragment", "Conversion de l'image capturée en Bitmap")
         val buffer = imageProxy.planes[0].buffer
         val bytes = ByteArray(buffer.remaining())
         buffer.get(bytes)
@@ -175,39 +199,52 @@ class ProfileFragment : Fragment() {
     }
 
     private fun saveProfile() {
+        Log.d("ProfileFragment", "Début de la sauvegarde du profil")
         val name = inputName.text.toString().trim()
         val age = inputAge.text.toString().trim().toIntOrNull()
-        val photo = capturedFaceBitmap ?: return Toast.makeText(requireContext(), "Photo requise", Toast.LENGTH_SHORT).show()
+        val photo = capturedFaceBitmap ?: run {
+            Log.d("ProfileFragment", "Sauvegarde annulée : photo requise")
+            Toast.makeText(requireContext(), "Photo requise", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         if (name.isEmpty() || age == null) {
+            Log.d("ProfileFragment", "Sauvegarde annulée : nom ou âge manquant/invalide")
             Toast.makeText(requireContext(), "Nom et âge requis", Toast.LENGTH_SHORT).show()
             return
         }
 
         val photoBase64 = photo.toBase64()
+        Log.d("ProfileFragment", "Conversion de la photo en Base64 effectuée")
 
         lifecycleScope.launch {
             try {
-                val personId = AzureFaceApiHelper.createPerson(name)
-                val faceAdded = AzureFaceApiHelper.addFaceToPerson(personId, photo)
-                AzureFaceApiHelper.trainPersonGroup()
-
                 val user = UserProfile(
                     name = name,
                     age = age,
                     photoBase64 = photoBase64,
-                    threadIdAzure = personId
+                    threadIdGPT = ""  // Laisser ce champ vide ou null pour l'instant
                 )
 
                 val db = PepperDatabase.getDatabase(requireContext())
                 db.userProfileDao().insert(user)
+                Log.d("ProfileFragment", "Profil inséré dans la base de données avec succès")
 
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), "Profil enregistré avec Azure !", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Profil enregistré en local dans la base de données!",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             } catch (e: Exception) {
+                Log.e("ProfileFragment", "Erreur lors de l'enregistrement du profil", e)
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), "Erreur Azure: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Erreur lors de l'enregistrement: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }

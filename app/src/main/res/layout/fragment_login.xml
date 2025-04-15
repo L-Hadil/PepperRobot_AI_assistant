@@ -17,17 +17,25 @@
             android:layout_marginBottom="24dp" />
 
         <Button
-            android:id="@+id/btnVerifyFace"
+            android:id="@+id/btnConfirmName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Vérifier le visage" />
+            android:text="Confirmer avec le prénom"
+            android:layout_marginBottom="16dp" />
+
         <EditText
             android:id="@+id/inputNameLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Entrez votre prénom"
             android:inputType="textPersonName"
-            android:layout_margin="16dp"/>
+            android:layout_marginBottom="24dp"/>
+
+        <Button
+            android:id="@+id/btnVerifyFace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vérifier le visage" />
 
     </LinearLayout>
 </ScrollView>

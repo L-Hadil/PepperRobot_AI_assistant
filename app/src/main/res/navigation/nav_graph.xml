@@ -49,6 +49,21 @@
             android:id="@+id/action_profileFragment_to_recognitionFragment"
             app:destination="@id/recognitionFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.example.pepperapp.ui.Fragments.ChatFragment"
+        android:label="Chat"
+        tools:layout="@layout/fragment_chat">
+        <argument
+            android:name="userName"
+            app:argType="string" />
+    </fragment>
+
+    <action
+        android:id="@+id/action_loginFragment_to_chatFragment"
+        app:destination="@id/chatFragment" />
+
+
 
 
 </navigation>
