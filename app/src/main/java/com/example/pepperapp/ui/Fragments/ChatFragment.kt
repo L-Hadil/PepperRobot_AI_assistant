@@ -1,18 +1,13 @@
 package com.example.pepperapp.ui.Fragments
 
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
+import android.content.Context
 import android.os.Bundle
-import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
 import android.util.Log
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.aldebaran.qi.QiException
 import com.aldebaran.qi.sdk.*
 import com.aldebaran.qi.sdk.builder.SayBuilder
 import com.aldebaran.qi.sdk.`object`.locale.*
@@ -31,7 +26,8 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
     private val TAG = "ChatFragment"
     private var qiContext: QiContext? = null
     private lateinit var userName: String
-    // Remplacer "your_api_key_here" par une méthode plus sécurisée en production.
+
+    // Attention : en production, gérez la clé API de manière sécurisée.
     private val apiKey = "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"
 
 
@@ -40,12 +36,13 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
 
     private lateinit var messageContainer: LinearLayout
     private lateinit var scrollView: ScrollView
-    private lateinit var askButton: Button
-    private lateinit var answerButton: Button
-    private lateinit var speechRecognizer: SpeechRecognizer
+    private lateinit var questionEditText: EditText
+    private lateinit var sendButton: Button
+
     private var latestQuestion: String = ""
+    // threadIdGPT correspond à celui créé initialement. Après le lancement d'un run,
+    // nous mettrons à jour ce threadId avec celui renvoyé par l'API via la réponse du run.
     private var threadIdGPT = ""
-    private val RECORD_AUDIO_REQUEST_CODE = 100
 
     private val storyParagraphs = listOf(
         "Il était une fois un loup qui vivait dans une belle forêt, entouré de tous ses amis. Il s’appelait Loup.",
@@ -55,42 +52,34 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         "Un jour, Maître Hibou lui dit : 'Tu dois apprendre à te calmer, Loup. Nous allons t’aider !'"
     )
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
         val view = inflater.inflate(R.layout.fragment_chat, container, false)
         QiSDK.register(requireActivity(), this)
 
         userName = arguments?.getString("userName") ?: "Utilisateur"
         messageContainer = view.findViewById(R.id.messageContainer)
         scrollView = view.findViewById(R.id.scrollView)
-        askButton = view.findViewById(R.id.buttonAskQuestion)
-        answerButton = view.findViewById(R.id.buttonAnswer)
+        questionEditText = view.findViewById(R.id.editTextQuestion)
+        sendButton = view.findViewById(R.id.buttonSendQuestion)
 
-        // Vérifier et demander la permission RECORD_AUDIO (Android 6+)
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
-            != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO_REQUEST_CODE)
-        } else {
-            setupSpeechRecognizer()
-        }
+        questionEditText.requestFocus()
 
-        askButton.setOnClickListener {
-            Log.d(TAG, "Bouton poser une question cliqué")
-            speak("Je t'écoute.") {
-                // On démarre l'écoute sur le thread UI après la parole
-                requireActivity().runOnUiThread { startListening() }
-            }
-        }
-
-        answerButton.setOnClickListener {
-            Log.d(TAG, "Bouton répondre cliqué")
-            if (latestQuestion.isNotEmpty()) {
+        sendButton.setOnClickListener {
+            val typedQuestion = questionEditText.text.toString()
+            if (typedQuestion.isNotBlank()) {
+                latestQuestion = typedQuestion
+                addMessageBubble(latestQuestion, isRobot = false)
+                questionEditText.text.clear()
+                hideKeyboard()
                 lifecycleScope.launch {
                     val response = sendToGPT(threadIdGPT, latestQuestion)
                     speak(response)
                     addMessageBubble(response, isRobot = true)
                 }
             } else {
-                Toast.makeText(requireContext(), "Aucune question enregistrée.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Veuillez saisir une question.", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -100,7 +89,6 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
             threadIdGPT = user?.threadIdGPT ?: createThreadOnOpenAI().also {
                 if (user != null) db.userProfileDao().update(user.copy(threadIdGPT = it))
             }
-            // On salue l'utilisateur et on raconte une histoire
             speak("Bonjour $userName ! Installe-toi bien, je vais te raconter une histoire.") {
                 lifecycleScope.launch {
                     delay(1000)
@@ -109,85 +97,43 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
                             Log.e(TAG, "QiContext perdu, arrêt de la narration.")
                             break
                         }
-                        Log.d(TAG, "Robot parle: $line")
+                        Log.d(TAG, "Robot raconte: $line")
                         try {
                             withContext(Dispatchers.IO) {
                                 val say = SayBuilder.with(qiContext)
                                     .withText(line)
                                     .withLocale(Locale(Language.FRENCH, Region.FRANCE))
                                     .build()
-                                // Ici, nous attendons la fin de la parole.
                                 say.async().run().get()
                             }
                         } catch (e: Exception) {
-                            Log.e(TAG, "Erreur lors de la parole pour la ligne: $line", e)
+                            Log.e(TAG, "Erreur lors de la narration: $line", e)
                         }
-                        Log.d(TAG, "Fin de parole: $line")
                         addMessageBubble(line, isRobot = true)
                     }
-                    speak("L'histoire est terminée. Appuie sur le bouton pour me poser ta question.")
+                    speak("L'histoire est terminée. Veuillez taper votre question.") {
+                        questionEditText.requestFocus()
+                        showKeyboard()
+                    }
                 }
             }
         }
         return view
     }
 
-    // Mise en place du SpeechRecognizer et implémentation des callbacks
-    private fun setupSpeechRecognizer() {
-        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(requireContext())
-        speechRecognizer.setRecognitionListener(object : android.speech.RecognitionListener {
-            override fun onReadyForSpeech(params: Bundle?) {
-                Log.d(TAG, "Le recognizer est prêt à écouter.")
-            }
-            override fun onBeginningOfSpeech() {
-                Log.d(TAG, "Début de la parole détecté.")
-            }
-            override fun onRmsChanged(rmsdB: Float) {
-                Log.d(TAG, "Niveau sonore: $rmsdB dB")
-            }
-            override fun onBufferReceived(buffer: ByteArray?) {}
-            override fun onEndOfSpeech() {
-                Log.d(TAG, "Fin de la parole.")
-            }
-            override fun onResults(results: Bundle?) {
-                val recognizedText = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull() ?: ""
-                Log.d(TAG, "Texte final reconnu: $recognizedText")
-                latestQuestion = recognizedText
-                addMessageBubble(recognizedText, isRobot = false)
-            }
-            override fun onPartialResults(partialResults: Bundle?) {
-                val partialText = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull() ?: ""
-                Log.d(TAG, "Résultat partiel: $partialText")
-            }
-            override fun onError(error: Int) {
-                Log.e(TAG, "Erreur reconnaissance vocale code: $error")
-                Toast.makeText(requireContext(), "Je n’ai pas bien entendu. Veux-tu réessayer ?", Toast.LENGTH_SHORT).show()
-            }
-            override fun onEvent(eventType: Int, params: Bundle?) {}
-        })
+    private fun showKeyboard() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(questionEditText, InputMethodManager.SHOW_IMPLICIT)
     }
 
-    // Préparation et démarrage de l'intent de reconnaissance vocale
-    private fun startListening() {
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            // Forcer la langue à être française
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "fr-FR")
-            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
-            // Augmenter la durée de silence pour éviter une détection prématurée de la fin de la parole
-            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 3000)
-            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 1500)
-        }
-        Log.d(TAG, "startListening déclenché")
-        speechRecognizer.startListening(intent)
+    private fun hideKeyboard() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(questionEditText.windowToken, 0)
     }
 
-    // La méthode speak déclenche la parole du robot.
-    // Elle vérifie que le qiContext est disponible avant d’appeler le SayBuilder.
     private fun speak(text: String, onDone: (() -> Unit)? = null) {
         if (qiContext == null) {
-            Log.e(TAG, "QiContext ou SpeechEngine indisponible. Impossible de parler.")
+            Log.e(TAG, "QiContext indisponible. Impossible de parler.")
             onDone?.invoke()
             return
         }
@@ -195,7 +141,6 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
             try {
                 Log.d(TAG, "Robot parle: $text")
                 val say = withContext(Dispatchers.IO) {
-                    // Vérifier encore une fois que le qiContext n'est pas nul
                     if (qiContext == null)
                         throw IllegalStateException("QiContext indisponible lors de la construction du SayBuilder.")
                     SayBuilder.with(qiContext)
@@ -203,7 +148,6 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
                         .withLocale(Locale(Language.FRENCH, Region.FRANCE))
                         .build()
                 }
-                // Lancer l'exécution asynchrone du SayBuilder et consommer le résultat
                 say.async().run().thenConsume {
                     Log.d(TAG, "Fin de parole: $text")
                     onDone?.invoke()
@@ -215,7 +159,6 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         }
     }
 
-    // Ajout d'une bulle de message dans l'interface
     private fun addMessageBubble(text: String, isRobot: Boolean) {
         val bubble = TextView(requireContext()).apply {
             this.text = text
@@ -249,24 +192,11 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
     }
 
     override fun onDestroyView() {
-        speechRecognizer.destroy()
         QiSDK.unregister(requireActivity(), this)
         super.onDestroyView()
     }
 
-    // Gestion de la réponse à la demande de permission
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == RECORD_AUDIO_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                setupSpeechRecognizer()
-            } else {
-                Toast.makeText(requireContext(), "La permission d'accéder au micro est requise.", Toast.LENGTH_SHORT).show()
-            }
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
-    // Méthodes réseau pour OpenAI (à adapter pour votre usage)
+    // Création du thread OpenAI
     private suspend fun createThreadOnOpenAI(): String = withContext(Dispatchers.IO) {
         val req = Request.Builder()
             .url("https://api.openai.com/v1/threads")
@@ -276,11 +206,20 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
             .post("{}".toRequestBody("application/json".toMediaType()))
             .build()
         val res = client.newCall(req).execute()
-        JSONObject(res.body?.string() ?: "").getString("id")
+        val body = res.body?.string()
+        Log.d(TAG, "createThreadOnOpenAI response: $body")
+        val json = JSONObject(body ?: "{}")
+        val threadId = json.optString("id", "")
+        if (threadId.isEmpty()) {
+            throw Exception("Impossible de récupérer un 'id' lors de la création du thread.")
+        }
+        threadId
     }
 
+    // Envoie la question et démarre un run puis effectue le polling avec le bon thread_id
     private suspend fun sendToGPT(threadId: String, message: String): String = withContext(Dispatchers.IO) {
-        val msg = JSONObject().apply {
+        // 1) Poste la question dans le thread
+        val msgObject = JSONObject().apply {
             put("role", "user")
             put("content", message)
         }
@@ -290,54 +229,87 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
                 .addHeader("Authorization", "Bearer $apiKey")
                 .addHeader("OpenAI-Beta", "assistants=v2")
                 .addHeader("Content-Type", "application/json")
-                .post(msg.toString().toRequestBody("application/json".toMediaType()))
+                .post(msgObject.toString().toRequestBody("application/json".toMediaType()))
                 .build()
         ).execute()
-        val assistantId = "asst_7NjhZUtxh1mBgCC1ZphdeQqS"
-        val runReq = JSONObject().apply { put("assistant_id", assistantId) }
+
+        // 2) Démarre un run
+        val assistantId = "asst_7NjhZUtxhimBgCClZphdeQqS"
+        val runObject = JSONObject().apply { put("assistant_id", assistantId) }
         val runRes = client.newCall(
             Request.Builder()
                 .url("https://api.openai.com/v1/threads/$threadId/runs")
                 .addHeader("Authorization", "Bearer $apiKey")
                 .addHeader("OpenAI-Beta", "assistants=v2")
                 .addHeader("Content-Type", "application/json")
-                .post(runReq.toString().toRequestBody("application/json".toMediaType()))
+                .post(runObject.toString().toRequestBody("application/json".toMediaType()))
                 .build()
         ).execute()
-        val runId = JSONObject(runRes.body?.string() ?: "").getString("id")
+        val runBody = runRes.body?.string()
+        Log.d(TAG, "sendToGPT runRes: $runBody")
+
+        val runJson = JSONObject(runBody ?: "{}")
+        val runId = runJson.optString("id", "")
+        // On récupère le thread_id renvoyé par le run
+        val newThreadId = runJson.optString("thread_id", "")
+        if (newThreadId.isNotEmpty()) {
+            // Met à jour le threadId à utiliser dans les appels suivants
+            Log.d(TAG, "Mise à jour du threadId: $newThreadId")
+        }
+        val effectiveThreadId = if (newThreadId.isNotEmpty()) newThreadId else threadId
+
+        if (runId.isEmpty()) {
+            return@withContext "Échec du run : Aucune 'id' dans la réponse."
+        }
+
+        // 3) Poll tant que le statut n'est pas "completed" ou pendant 30 itérations
         repeat(30) {
             delay(1000)
             val check = client.newCall(
                 Request.Builder()
-                    .url("https://api.openai.com/v1/threads/$threadId/runs/$runId")
+                    .url("https://api.openai.com/v1/threads/$effectiveThreadId/runs/$runId")
                     .addHeader("Authorization", "Bearer $apiKey")
                     .addHeader("OpenAI-Beta", "assistants=v2")
-                    .get().build()
+                    .get()
+                    .build()
             ).execute()
-            val status = JSONObject(check.body?.string() ?: "").optString("status")
+            val checkBody = check.body?.string()
+            Log.d(TAG, "Statut run: $checkBody")
+            val status = JSONObject(checkBody ?: "{}").optString("status", "")
             if (status == "completed") {
-                return@withContext fetchLastResponse(threadId)
+                return@withContext fetchLastResponse(effectiveThreadId)
             }
         }
-        return@withContext "Je n’ai pas reçu de réponse."
+        "Je n’ai pas reçu de réponse."
     }
 
+    // Récupère la dernière réponse du format texte
     private suspend fun fetchLastResponse(threadId: String): String = withContext(Dispatchers.IO) {
-        val res = client.newCall(
+        val resp = client.newCall(
             Request.Builder()
                 .url("https://api.openai.com/v1/threads/$threadId/messages")
                 .addHeader("Authorization", "Bearer $apiKey")
                 .addHeader("OpenAI-Beta", "assistants=v2")
-                .get().build()
+                .get()
+                .build()
         ).execute()
-        val data = JSONObject(res.body?.string() ?: "").getJSONArray("data")
+        val body = resp.body?.string().orEmpty()
+        Log.d(TAG, "fetchLastResponse: $body")
+        val data = JSONObject(body).optJSONArray("data") ?: return@withContext "Aucune donnée renvoyée."
         for (i in 0 until data.length()) {
             val msg = data.getJSONObject(i)
-            if (msg.getString("role") == "assistant") {
-                return@withContext msg.getJSONArray("content")
-                    .getJSONObject(0)
-                    .getJSONObject("text")
-                    .getString("value")
+            if (msg.optString("role") == "assistant") {
+                // Nouveau format "text" : on parcourt le tableau "content"
+                val contents = msg.optJSONArray("content") ?: continue
+                for (j in 0 until contents.length()) {
+                    val contentObj = contents.getJSONObject(j)
+                    if (contentObj.optString("type") == "text") {
+                        val textResponse = contentObj.optString("text", "")
+                        if (textResponse.isNotEmpty()) {
+                            return@withContext textResponse
+                        }
+                    }
+                }
             }
         }
         "Aucune réponse trouvée."
