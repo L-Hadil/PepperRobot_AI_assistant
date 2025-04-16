@@ -22,3 +22,4 @@ class ExampleInstrumentedTest {
         assertEquals("com.example.pepperrobot_ai_assistant", appContext.packageName)
     }
 }
+
