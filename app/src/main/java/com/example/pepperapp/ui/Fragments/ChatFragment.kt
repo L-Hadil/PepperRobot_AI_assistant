@@ -20,6 +20,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.MediaType.Companion.toMediaType
 import org.json.JSONObject
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class ChatFragment : Fragment(), RobotLifecycleCallbacks {
 
@@ -27,10 +28,15 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
     private var qiContext: QiContext? = null
     private lateinit var userName: String
 
-    // Attention : en production, gérez la clé API de manière sécurisée.
+    // ATTENTION : en production, gérez votre clé API de façon sécurisée.
     private val apiKey = "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"
 
-    private val client = OkHttpClient()
+    // Client OkHttp avec délais étendus
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
+        .build()
 
     private lateinit var messageContainer: LinearLayout
     private lateinit var scrollView: ScrollView
@@ -38,6 +44,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
     private lateinit var sendButton: Button
 
     private var latestQuestion: String = ""
+    // Le thread pour la conversation (créé ou récupéré) est stocké ici et utilisé tout au long de l'échange.
     private var threadIdGPT = ""
 
     private val storyParagraphs = listOf(
@@ -48,7 +55,11 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         "Un jour, Maître Hibou lui dit : 'Tu dois apprendre à te calmer, Loup. Nous allons t’aider !'"
     )
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         val view = inflater.inflate(R.layout.fragment_chat, container, false)
         QiSDK.register(requireActivity(), this)
 
@@ -58,19 +69,19 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         questionEditText = view.findViewById(R.id.editTextQuestion)
         sendButton = view.findViewById(R.id.buttonSendQuestion)
 
-        // Assurer que l'EditText obtienne le focus immédiatement.
+        // Focus direct sur le champ
         questionEditText.requestFocus()
 
         sendButton.setOnClickListener {
             val typedQuestion = questionEditText.text.toString()
-            // Ajout du log pour vérifier le texte saisi par l'utilisateur.
-            Log.d(TAG, "Texte saisi par l'utilisateur: \"$typedQuestion\"")
+            Log.d(TAG, "Texte saisi par l'utilisateur : \"$typedQuestion\"")
             if (typedQuestion.isNotBlank()) {
                 latestQuestion = typedQuestion
                 addMessageBubble(latestQuestion, isRobot = false)
                 questionEditText.text.clear()
                 hideKeyboard()
                 lifecycleScope.launch {
+                    Log.d(TAG, "📌 threadId utilisé pour la requête: $threadIdGPT")
                     val response = sendToGPT(threadIdGPT, latestQuestion)
                     speak(response)
                     addMessageBubble(response, isRobot = true)
@@ -80,31 +91,45 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
             }
         }
 
+        // Initialisation du thread GPT et narration de l'histoire
         lifecycleScope.launch {
             val db = PepperDatabase.getDatabase(requireContext())
             val user = db.userProfileDao().getUserByName(userName)
-            threadIdGPT = user?.threadIdGPT ?: createThreadOnOpenAI().also {
-                if (user != null) db.userProfileDao().update(user.copy(threadIdGPT = it))
+
+            threadIdGPT = if (!user?.threadIdGPT.isNullOrBlank()) {
+                Log.d(TAG, "✅ Thread existant trouvé pour ${user?.name} : ${user?.threadIdGPT}")
+                user!!.threadIdGPT!!
+            } else {
+                Log.d(TAG, "🆕 Aucun thread trouvé. Création d’un nouveau...")
+                val newThreadId = createThreadOnOpenAI()
+                Log.d(TAG, "🧵 Nouveau thread ID généré : $newThreadId")
+                if (user != null) {
+                    db.userProfileDao().update(user.copy(threadIdGPT = newThreadId))
+                    Log.d(TAG, "💾 Thread ID sauvegardé en base pour ${user.name}")
+                }
+                newThreadId
             }
+
+            Log.d(TAG, "📢 Démarrage de l'histoire...")
             speak("Bonjour $userName ! Installe-toi bien, je vais te raconter une histoire.") {
                 lifecycleScope.launch {
                     delay(1000)
                     for (line in storyParagraphs) {
                         if (qiContext == null) {
-                            Log.e(TAG, "QiContext perdu, arrêt de la narration.")
+                            Log.e(TAG, "❌ QiContext perdu, arrêt de la narration.")
                             break
                         }
-                        Log.d(TAG, "Robot raconte: $line")
+                        Log.d(TAG, "📖 Robot raconte: $line")
                         try {
                             withContext(Dispatchers.IO) {
                                 val say = SayBuilder.with(qiContext)
                                     .withText(line)
                                     .withLocale(Locale(Language.FRENCH, Region.FRANCE))
                                     .build()
-                                say.async().run().get() // Attend la fin de la phrase
+                                say.async().run().get()
                             }
                         } catch (e: Exception) {
-                            Log.e(TAG, "Erreur lors de la narration: $line", e)
+                            Log.e(TAG, "❌ Erreur lors de la narration: $line", e)
                         }
                         addMessageBubble(line, isRobot = true)
                     }
@@ -115,8 +140,10 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
                 }
             }
         }
+
         return view
     }
+
 
     private fun showKeyboard() {
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -172,7 +199,9 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         }
         bubble.layoutParams = params
         messageContainer.addView(bubble)
-        scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
+        scrollView.post {
+            scrollView.fullScroll(View.FOCUS_DOWN)
+        }
     }
 
     override fun onRobotFocusGained(qiContext: QiContext?) {
@@ -193,7 +222,11 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         super.onDestroyView()
     }
 
-    // Création du thread côté OpenAI (sans instructions supplémentaires)
+    // --- Intégration de l'API OpenAI ---
+
+    /**
+     * Crée un nouveau thread côté OpenAI.
+     */
     private suspend fun createThreadOnOpenAI(): String = withContext(Dispatchers.IO) {
         val req = Request.Builder()
             .url("https://api.openai.com/v1/threads")
@@ -213,77 +246,75 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         threadId
     }
 
+    /**
+     * Envoie le message utilisateur dans le thread, démarre un run et attend la réponse.
+     * IMPORTANT : On utilise toujours le même thread (threadId) pour garder la continuité de la conversation.
+     */
     private suspend fun sendToGPT(threadId: String, message: String): String = withContext(Dispatchers.IO) {
-        // 1) Envoyer la question dans le thread existant
+        // 1) Envoyer le message utilisateur
         val msgObject = JSONObject().apply {
             put("role", "user")
             put("content", message)
         }
+        client.newCall(
+            Request.Builder()
+                .url("https://api.openai.com/v1/threads/$threadId/messages")
+                .addHeader("Authorization", "Bearer $apiKey")
+                .addHeader("OpenAI-Beta", "assistants=v2")
+                .addHeader("Content-Type", "application/json")
+                .post(msgObject.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+        ).execute()
 
-        val messageRequest = Request.Builder()
-            .url("https://api.openai.com/v1/threads/$threadId/messages")
-            .addHeader("Authorization", "Bearer $apiKey")
-            .addHeader("OpenAI-Beta", "assistants=v2")
-            .addHeader("Content-Type", "application/json")
-            .post(msgObject.toString().toRequestBody("application/json".toMediaType()))
-            .build()
-        client.newCall(messageRequest).execute()
-
-        // 2) Lancer un run sur le thread
+        // 2) Démarrer un run (sans transmettre de champs "instructions" supplémentaires)
         val assistantId = "asst_7NjhZUtxhimBgCClZphdeQqS"
         val runObject = JSONObject().apply {
             put("assistant_id", assistantId)
+            // Ne pas ajouter de "instructions" pour éviter d'envoyer le contexte système inutilement.
         }
-
-        val runRequest = Request.Builder()
-            .url("https://api.openai.com/v1/threads/$threadId/runs")
-            .addHeader("Authorization", "Bearer $apiKey")
-            .addHeader("OpenAI-Beta", "assistants=v2")
-            .addHeader("Content-Type", "application/json")
-            .post(runObject.toString().toRequestBody("application/json".toMediaType()))
-            .build()
-
-        val runResponse = client.newCall(runRequest).execute()
-        val runBody = runResponse.body?.string()
+        val runRes = client.newCall(
+            Request.Builder()
+                .url("https://api.openai.com/v1/threads/$threadId/runs")
+                .addHeader("Authorization", "Bearer $apiKey")
+                .addHeader("OpenAI-Beta", "assistants=v2")
+                .addHeader("Content-Type", "application/json")
+                .post(runObject.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+        ).execute()
+        val runBody = runRes.body?.string()
         Log.d(TAG, "sendToGPT runRes: $runBody")
 
         val runJson = JSONObject(runBody ?: "{}")
         val runId = runJson.optString("id", "")
-
+        // IMPORTANT : NE PAS mettre à jour le threadId. On utilise toujours celui déjà créé.
         if (runId.isEmpty()) {
-            Log.e(TAG, "❌ runId est vide. JSON: $runJson")
             return@withContext "Échec du run : Aucune 'id' dans la réponse."
         }
 
-        val statusUrl = "https://api.openai.com/v1/threads/$threadId/runs/$runId"
-        Log.d(TAG, "🛰️ Polling URL: $statusUrl")
-
-        // 3) Poller le run jusqu’à ce qu’il soit terminé
+        // 3) Polling : attendre que le run soit complété (statut "completed")
         repeat(30) {
             delay(1000)
-            val checkRequest = Request.Builder()
-                .url(statusUrl)
-                .addHeader("Authorization", "Bearer $apiKey")
-                .addHeader("OpenAI-Beta", "assistants=v2")
-                .get()
-                .build()
-
-            val checkResponse = client.newCall(checkRequest).execute()
-            val checkBody = checkResponse.body?.string()
-            Log.d(TAG, "Statut run ($it): $checkBody")
-
+            val check = client.newCall(
+                Request.Builder()
+                    .url("https://api.openai.com/v1/threads/$threadId/runs/$runId")
+                    .addHeader("Authorization", "Bearer $apiKey")
+                    .addHeader("OpenAI-Beta", "assistants=v2")
+                    .get()
+                    .build()
+            ).execute()
+            val checkBody = check.body?.string()
+            Log.d(TAG, "Statut run: $checkBody")
             val status = JSONObject(checkBody ?: "{}").optString("status", "")
             if (status == "completed") {
                 return@withContext fetchLastResponse(threadId)
             }
         }
-
-        return@withContext "Je n’ai pas reçu de réponse."
+        "Je n’ai pas reçu de réponse."
     }
 
-
-
-    // Récupère la dernière réponse au format texte.
+    /**
+     * Récupère la dernière réponse du modèle OpenAI depuis le thread.
+     */
     private suspend fun fetchLastResponse(threadId: String): String = withContext(Dispatchers.IO) {
         val resp = client.newCall(
             Request.Builder()
