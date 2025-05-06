@@ -3,67 +3,127 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/startChildFragment">
 
-    <!-- HomeFragment -->
+    <!-- 1. Écran de démarrage "StartChildFragment" -->
     <fragment
-        android:id="@+id/homeFragment"
-        android:name="com.example.pepperapp.ui.Fragments.HomeFragment"
-        android:label="Accueil"
-        tools:layout="@layout/fragment_home">
-
-        <!-- Go to profile creation -->
+        android:id="@+id/startChildFragment"
+        android:name="com.example.pepperapp.ui.Fragments.StartChildFragment"
+        android:label="Start"
+        tools:layout="@layout/fragment_start_child">
         <action
-            android:id="@+id/action_homeFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
-
-        <!-- Go to face recognition -->
-        <action
-            android:id="@+id/action_homeFragment_to_recognitionFragment"
-            app:destination="@id/recognitionFragment" />
+            android:id="@+id/action_startChildFragment_to_chooseFragment"
+            app:destination="@id/chooseFragment" />
     </fragment>
 
-    <!-- FaceRecognitionFragment -->
+    <!-- 2. Écran de choix -->
     <fragment
-        android:id="@+id/recognitionFragment"
-        android:name="com.example.pepperapp.ui.Fragments.FaceRecognitionFragment"
-        android:label="Reconnaissance"
-        tools:layout="@layout/face_recognition">
-
-        <!-- Recognition failed → create profile -->
+        android:id="@+id/chooseFragment"
+        android:name="com.example.pepperapp.ui.Fragments.ChooseFragment"
+        android:label="Choose"
+        tools:layout="@layout/fragment_choose">
         <action
-            android:id="@+id/action_recognitionFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
+            android:id="@+id/action_chooseFragment_to_listenStoryFragment"
+            app:destination="@id/listenStoryFragment" />
+        <action
+            android:id="@+id/action_chooseFragment_to_storySelectionFragment"
+            app:destination="@id/storySelectionFragment" />
+        <action
+            android:id="@+id/action_chooseFragment_to_interactionsFragment"
+            app:destination="@id/interactionsFragment" />
+
+        <action
+            android:id="@+id/action_chooseFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+
     </fragment>
 
-    <!-- ProfileFragment -->
+    <!-- 3.a Écouter l’histoire -->
     <fragment
-        android:id="@+id/profileFragment"
-        android:name="com.example.pepperapp.ui.Fragments.ProfileFragment"
-        android:label="Création de Profil"
-        tools:layout="@layout/fragment_profile">
+        android:id="@+id/listenStoryFragment"
+        android:name="com.example.pepperapp.ui.Fragments.ListenStoryFragment"
+        android:label="Écouter l’histoire"
+        tools:layout="@layout/fragment_listen_story" />
+
+    <!-- 3.b Histoire du Nuage -->
+    <fragment
+        android:id="@+id/NuageFragment"
+        android:name="com.example.pepperapp.ui.Fragments.NuageFragment"
+        android:label="Histoire du Nuage"
+        tools:layout="@layout/fragment_listen_story" />
+
+    <!-- 3.c Histoire de Pepper -->
+    <fragment
+        android:id="@+id/pepperStoryFragment"
+        android:name="com.example.pepperapp.ui.Fragments.PepperStoryFragment"
+        android:label="Histoire de Pepper"
+        tools:layout="@layout/fragment_listen_story" />
+
+    <!-- 3.d Sélection d'histoire -->
+    <fragment
+        android:id="@+id/storySelectionFragment"
+        android:name="com.example.pepperapp.ui.Fragments.StorySelectionFragment"
+        android:label="Sélection d'histoire"
+        tools:layout="@layout/fragment_story_selection">
         <action
-            android:id="@+id/action_profileFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
+            android:id="@+id/action_storySelectionFragment_to_listenStoryFragment"
+            app:destination="@id/listenStoryFragment" />
         <action
-            android:id="@+id/action_profileFragment_to_recognitionFragment"
-            app:destination="@id/recognitionFragment" />
+            android:id="@+id/action_storySelectionFragment_to_nuageFragment"
+            app:destination="@id/NuageFragment" />
+        <action
+            android:id="@+id/action_storySelectionFragment_to_pepperStoryFragment"
+            app:destination="@id/pepperStoryFragment" />
     </fragment>
+
+    <!-- 4. Interactions parent -->
+    <fragment
+        android:id="@+id/interactionsFragment"
+        android:name="com.example.pepperapp.ui.Fragments.InteractionsFragment"
+        android:label="Interactions"
+        tools:layout="@layout/fragment_interactions">
+        <action
+            android:id="@+id/action_interactionsFragment_to_sadFragment"
+            app:destination="@id/sadFragment" />
+        <action
+            android:id="@+id/action_interactionsFragment_to_happyFragment"
+            app:destination="@id/happyFragment" />
+        <action
+            android:id="@+id/action_interactionsFragment_to_hugFragment"
+            app:destination="@id/hugFragment" />
+        <action
+            android:id="@+id/action_interactionsFragment_to_goodbyeFragment"
+            app:destination="@id/goodbyeFragment" />
+    </fragment>
+
+    <!-- 5. Fragments d’émotions -->
+    <fragment
+        android:id="@+id/sadFragment"
+        android:name="com.example.pepperapp.ui.Fragments.SadFragment"
+        android:label="Sad"
+        tools:layout="@layout/fragment_sad" />
+    <fragment
+        android:id="@+id/happyFragment"
+        android:name="com.example.pepperapp.ui.Fragments.HappyFragment"
+        android:label="Happy"
+        tools:layout="@layout/fragment_happy" />
+    <fragment
+        android:id="@+id/hugFragment"
+        android:name="com.example.pepperapp.ui.Fragments.HugFragment"
+        android:label="Hug"
+        tools:layout="@layout/fragment_hug" />
+    <fragment
+        android:id="@+id/goodbyeFragment"
+        android:name="com.example.pepperapp.ui.Fragments.GoodbyeFragment"
+        android:label="Goodbye"
+        tools:layout="@layout/fragment_goodbye" />
+
+
     <fragment
         android:id="@+id/chatFragment"
         android:name="com.example.pepperapp.ui.Fragments.ChatFragment"
-        android:label="Chat"
-        tools:layout="@layout/fragment_chat">
-        <argument
-            android:name="userName"
-            app:argType="string" />
-    </fragment>
-
-    <action
-        android:id="@+id/action_loginFragment_to_chatFragment"
-        app:destination="@id/chatFragment" />
-
-
+        android:label="Chat-GPT feedback"
+        tools:layout="@layout/fragment_chat" />
 
 
 </navigation>

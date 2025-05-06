@@ -11,7 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import com.aldebaran.qi.sdk.*
 import com.aldebaran.qi.sdk.builder.SayBuilder
 import com.aldebaran.qi.sdk.`object`.locale.*
-import com.aldebaran.qi.sdk.`object`.locale.Locale
 import com.example.pepperapp.R
 import com.example.pepperapp.data.PepperDatabase
 import kotlinx.coroutines.*
@@ -19,7 +18,6 @@ import okhttp3.*
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.MediaType.Companion.toMediaType
 import org.json.JSONObject
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 class ChatFragment : Fragment(), RobotLifecycleCallbacks {
@@ -44,16 +42,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
     private lateinit var sendButton: Button
 
     private var latestQuestion: String = ""
-    // Le thread pour la conversation (créé ou récupéré) est stocké ici et utilisé tout au long de l'échange.
     private var threadIdGPT = ""
-
-    private val storyParagraphs = listOf(
-        "Il était une fois un loup qui vivait dans une belle forêt, entouré de tous ses amis. Il s’appelait Loup.",
-        "Mais ce loup avait un souci : il était trop émotif. Joyeux, fâché, triste, excité… il changeait d’humeur à cent à l’heure !",
-        "Ainsi, quand Loup était d’humeur joyeuse, il sifflotait, faisait des blagues et débordait d’idées pour s’amuser.",
-        "Mais si quelque chose le contrariait… Ah ! Il se fâchait très fort !",
-        "Un jour, Maître Hibou lui dit : 'Tu dois apprendre à te calmer, Loup. Nous allons t’aider !'"
-    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,25 +52,22 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         val view = inflater.inflate(R.layout.fragment_chat, container, false)
         QiSDK.register(requireActivity(), this)
 
-        userName = arguments?.getString("userName") ?: "Utilisateur"
+        userName = arguments?.getString("userName") ?: "petit enfant"
         messageContainer = view.findViewById(R.id.messageContainer)
         scrollView = view.findViewById(R.id.scrollView)
         questionEditText = view.findViewById(R.id.editTextQuestion)
         sendButton = view.findViewById(R.id.buttonSendQuestion)
 
-        // Focus direct sur le champ
         questionEditText.requestFocus()
 
         sendButton.setOnClickListener {
             val typedQuestion = questionEditText.text.toString()
-            Log.d(TAG, "Texte saisi par l'utilisateur : \"$typedQuestion\"")
             if (typedQuestion.isNotBlank()) {
                 latestQuestion = typedQuestion
                 addMessageBubble(latestQuestion, isRobot = false)
                 questionEditText.text.clear()
                 hideKeyboard()
                 lifecycleScope.launch {
-                    Log.d(TAG, "📌 threadId utilisé pour la requête: $threadIdGPT")
                     val response = sendToGPT(threadIdGPT, latestQuestion)
                     speak(response)
                     addMessageBubble(response, isRobot = true)
@@ -91,59 +77,29 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
             }
         }
 
-        // Initialisation du thread GPT et narration de l'histoire
         lifecycleScope.launch {
             val db = PepperDatabase.getDatabase(requireContext())
             val user = db.userProfileDao().getUserByName(userName)
 
             threadIdGPT = if (!user?.threadIdGPT.isNullOrBlank()) {
-                Log.d(TAG, "✅ Thread existant trouvé pour ${user?.name} : ${user?.threadIdGPT}")
                 user!!.threadIdGPT!!
             } else {
-                Log.d(TAG, "🆕 Aucun thread trouvé. Création d’un nouveau...")
                 val newThreadId = createThreadOnOpenAI()
-                Log.d(TAG, "🧵 Nouveau thread ID généré : $newThreadId")
                 if (user != null) {
                     db.userProfileDao().update(user.copy(threadIdGPT = newThreadId))
-                    Log.d(TAG, "💾 Thread ID sauvegardé en base pour ${user.name}")
                 }
                 newThreadId
             }
 
-            Log.d(TAG, "📢 Démarrage de l'histoire...")
-            speak("Bonjour $userName ! Installe-toi bien, je vais te raconter une histoire.") {
-                lifecycleScope.launch {
-                    delay(1000)
-                    for (line in storyParagraphs) {
-                        if (qiContext == null) {
-                            Log.e(TAG, "❌ QiContext perdu, arrêt de la narration.")
-                            break
-                        }
-                        Log.d(TAG, "📖 Robot raconte: $line")
-                        try {
-                            withContext(Dispatchers.IO) {
-                                val say = SayBuilder.with(qiContext)
-                                    .withText(line)
-                                    .withLocale(Locale(Language.FRENCH, Region.FRANCE))
-                                    .build()
-                                say.async().run().get()
-                            }
-                        } catch (e: Exception) {
-                            Log.e(TAG, "❌ Erreur lors de la narration: $line", e)
-                        }
-                        addMessageBubble(line, isRobot = true)
-                    }
-                    speak("L'histoire est terminée. Veuillez taper votre question.") {
-                        questionEditText.requestFocus()
-                        showKeyboard()
-                    }
-                }
+            // Salutation et invitation à poser une question
+            speak("Bonjour $userName ! Installe-toi bien et pose ta question.") {
+                questionEditText.requestFocus()
+                showKeyboard()
             }
         }
 
         return view
     }
-
 
     private fun showKeyboard() {
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -157,27 +113,15 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
 
     private fun speak(text: String, onDone: (() -> Unit)? = null) {
         if (qiContext == null) {
-            Log.e(TAG, "QiContext indisponible. Impossible de parler.")
             onDone?.invoke()
             return
         }
         lifecycleScope.launch {
-            try {
-                Log.d(TAG, "Robot parle: $text")
-                val say = withContext(Dispatchers.IO) {
-                    if (qiContext == null)
-                        throw IllegalStateException("QiContext indisponible lors de la construction du SayBuilder.")
-                    SayBuilder.with(qiContext)
-                        .withText(text)
-                        .withLocale(Locale(Language.FRENCH, Region.FRANCE))
-                        .build()
-                }
-                say.async().run().thenConsume {
-                    Log.d(TAG, "Fin de parole: $text")
-                    onDone?.invoke()
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Erreur pendant speak", e)
+            val say = SayBuilder.with(qiContext)
+                .withText(text)
+                .withLocale(Locale(Language.FRENCH, Region.FRANCE))
+                .build()
+            say.async().run().thenConsume {
                 onDone?.invoke()
             }
         }
@@ -199,14 +143,11 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         }
         bubble.layoutParams = params
         messageContainer.addView(bubble)
-        scrollView.post {
-            scrollView.fullScroll(View.FOCUS_DOWN)
-        }
+        scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
     }
 
     override fun onRobotFocusGained(qiContext: QiContext?) {
         this.qiContext = qiContext
-        Log.d(TAG, "Robot focus gagné")
     }
 
     override fun onRobotFocusLost() {
@@ -222,11 +163,6 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         super.onDestroyView()
     }
 
-    // --- Intégration de l'API OpenAI ---
-
-    /**
-     * Crée un nouveau thread côté OpenAI.
-     */
     private suspend fun createThreadOnOpenAI(): String = withContext(Dispatchers.IO) {
         val req = Request.Builder()
             .url("https://api.openai.com/v1/threads")
@@ -236,26 +172,12 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
             .post("{}".toRequestBody("application/json".toMediaType()))
             .build()
         val res = client.newCall(req).execute()
-        val body = res.body?.string()
-        Log.d(TAG, "createThreadOnOpenAI response: $body")
-        val json = JSONObject(body ?: "{}")
-        val threadId = json.optString("id", "")
-        if (threadId.isEmpty()) {
-            throw Exception("Impossible de récupérer un 'id' lors de la création du thread.")
-        }
-        threadId
+        val json = JSONObject(res.body?.string() ?: "{}")
+        return@withContext json.optString("id", "")
     }
 
-    /**
-     * Envoie le message utilisateur dans le thread, démarre un run et attend la réponse.
-     * IMPORTANT : On utilise toujours le même thread (threadId) pour garder la continuité de la conversation.
-     */
     private suspend fun sendToGPT(threadId: String, message: String): String = withContext(Dispatchers.IO) {
-        // 1) Envoyer le message utilisateur
-        val msgObject = JSONObject().apply {
-            put("role", "user")
-            put("content", message)
-        }
+        val msgObject = JSONObject().apply { put("role", "user"); put("content", message) }
         client.newCall(
             Request.Builder()
                 .url("https://api.openai.com/v1/threads/$threadId/messages")
@@ -266,12 +188,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
                 .build()
         ).execute()
 
-        // 2) Démarrer un run (sans transmettre de champs "instructions" supplémentaires)
-        val assistantId = "asst_7NjhZUtxhimBgCClZphdeQqS"
-        val runObject = JSONObject().apply {
-            put("assistant_id", assistantId)
-            // Ne pas ajouter de "instructions" pour éviter d'envoyer le contexte système inutilement.
-        }
+        val runObject = JSONObject().apply { put("assistant_id", "asst_7NjhZUtxhimBgCClZphdeQqS") }
         val runRes = client.newCall(
             Request.Builder()
                 .url("https://api.openai.com/v1/threads/$threadId/runs")
@@ -281,17 +198,9 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
                 .post(runObject.toString().toRequestBody("application/json".toMediaType()))
                 .build()
         ).execute()
-        val runBody = runRes.body?.string()
-        Log.d(TAG, "sendToGPT runRes: $runBody")
+        val runId = JSONObject(runRes.body?.string() ?: "{}").optString("id", "")
+        if (runId.isEmpty()) return@withContext "Échec du run : Aucune 'id'"
 
-        val runJson = JSONObject(runBody ?: "{}")
-        val runId = runJson.optString("id", "")
-        // IMPORTANT : NE PAS mettre à jour le threadId. On utilise toujours celui déjà créé.
-        if (runId.isEmpty()) {
-            return@withContext "Échec du run : Aucune 'id' dans la réponse."
-        }
-
-        // 3) Polling : attendre que le run soit complété (statut "completed")
         repeat(30) {
             delay(1000)
             val check = client.newCall(
@@ -302,19 +211,12 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
                     .get()
                     .build()
             ).execute()
-            val checkBody = check.body?.string()
-            Log.d(TAG, "Statut run: $checkBody")
-            val status = JSONObject(checkBody ?: "{}").optString("status", "")
-            if (status == "completed") {
-                return@withContext fetchLastResponse(threadId)
-            }
+            val status = JSONObject(check.body?.string() ?: "{}").optString("status", "")
+            if (status == "completed") return@withContext fetchLastResponse(threadId)
         }
         "Je n’ai pas reçu de réponse."
     }
 
-    /**
-     * Récupère la dernière réponse du modèle OpenAI depuis le thread.
-     */
     private suspend fun fetchLastResponse(threadId: String): String = withContext(Dispatchers.IO) {
         val resp = client.newCall(
             Request.Builder()
@@ -324,9 +226,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
                 .get()
                 .build()
         ).execute()
-        val body = resp.body?.string().orEmpty()
-        Log.d(TAG, "fetchLastResponse: $body")
-        val data = JSONObject(body).optJSONArray("data") ?: return@withContext "Aucune donnée renvoyée."
+        val data = JSONObject(resp.body?.string().orEmpty()).optJSONArray("data") ?: return@withContext "Aucune donnée"
         for (i in 0 until data.length()) {
             val msg = data.getJSONObject(i)
             if (msg.optString("role") == "assistant") {
@@ -334,18 +234,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
                 for (j in 0 until contents.length()) {
                     val contentObj = contents.getJSONObject(j)
                     if (contentObj.optString("type") == "text") {
-                        val textObj = contentObj.optJSONObject("text")
-                        if (textObj != null) {
-                            val value = textObj.optString("value", "")
-                            if (value.isNotEmpty()) {
-                                return@withContext value
-                            }
-                        } else {
-                            val directText = contentObj.optString("text", "")
-                            if (directText.isNotEmpty()) {
-                                return@withContext directText
-                            }
-                        }
+                        return@withContext contentObj.optJSONObject("text")?.optString("value") ?: contentObj.optString("text", "")
                     }
                 }
             }

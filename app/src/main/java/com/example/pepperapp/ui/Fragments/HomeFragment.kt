@@ -30,7 +30,7 @@ class HomeFragment : Fragment() {
         btnStart = view.findViewById(R.id.btnTakePhoto)
         btnWelcomeBack = view.findViewById(R.id.btnRecognizeFace)
 
-        // "Let's start" redirige directement vers le formulaire de création de profil
+        /*"Let's start" redirige directement vers le formulaire de création de profil
         btnStart.setOnClickListener {
             SharedBitmapHolder.bitmap = null  // réinitialise l'image
             findNavController().navigate(R.id.action_homeFragment_to_profileFragment)
@@ -40,7 +40,7 @@ class HomeFragment : Fragment() {
         btnWelcomeBack.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_recognitionFragment)
         }
-
+*/
         return view
     }
 }

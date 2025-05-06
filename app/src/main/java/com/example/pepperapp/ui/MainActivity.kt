@@ -7,8 +7,8 @@ import com.aldebaran.qi.sdk.QiContext
 import com.aldebaran.qi.sdk.QiSDK
 import com.aldebaran.qi.sdk.RobotLifecycleCallbacks
 import com.example.pepperapp.ui.Fragments.ProfileFragment
-import com.example.pepperapp.ui.Fragments.StartFragment
 import com.example.pepperapp.R
+import com.example.pepperapp.ui.Fragments.StartChildFragment
 
 class MainActivity : AppCompatActivity(), RobotLifecycleCallbacks {
 
@@ -18,11 +18,7 @@ class MainActivity : AppCompatActivity(), RobotLifecycleCallbacks {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.container, StartFragment())
-                .commit()
-        }
+
 
         QiSDK.register(this, this)
     }
@@ -50,4 +46,5 @@ class MainActivity : AppCompatActivity(), RobotLifecycleCallbacks {
     }
 
     fun getQiContext(): QiContext? = qiContext
+
 }

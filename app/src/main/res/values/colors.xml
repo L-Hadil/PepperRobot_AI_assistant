@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#081453</color>
-    <color name="purple_500">#0E2398</color>
-    <color name="purple_700">#4A61E4</color>
-    <color name="teal_200">#001FCD</color>
-    <color name="teal_700">#001275</color>
+
+    <color name="earth_brown_light">#D2B48C</color> <!-- Marron clair (sable) -->
+    <color name="earth_brown_dark">#8B4513</color> <!-- Marron foncé (terre) -->
+    <color name="grass_green">#9ACD32</color> <!-- Vert herbe -->
+    <color name="sky_blue">#87CEEB</color> <!-- Bleu ciel -->
+    <color name="sun_yellow">#F4A300</color> <!-- Jaune soleil -->
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

@@ -15,7 +15,7 @@
         android:id="@+id/chatTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="L’histoire de Loup 🐺"
+        android:text="pose ta question et pepper va te répondre"
         android:textSize="24sp"
         android:textStyle="bold"
         android:layout_gravity="center_horizontal"

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Image en fond -->
+    <ImageView
+        android:id="@+id/imageMamouth"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/backgroundmammouth" />
+
+    <!-- Bouton Start par dessus l'image -->
+    <Button
+        android:id="@+id/buttonStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="START"
+        android:backgroundTint="#F4A300"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal|bottom"
+        android:minWidth="200dp"
+        android:minHeight="64dp"
+        android:layout_marginBottom="48dp" />
+
+</FrameLayout>

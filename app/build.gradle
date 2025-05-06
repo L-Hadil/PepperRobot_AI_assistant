@@ -10,7 +10,7 @@ android {
     buildToolsVersion "32.0.0"
 
     defaultConfig {
-        applicationId "com.example.pepperrobot_ai_assistant"
+        applicationId "com.example.pepperapp"
         minSdkVersion 23
         targetSdkVersion 32
         versionCode 1
