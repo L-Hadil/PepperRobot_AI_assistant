@@ -62,7 +62,9 @@ class HugFragment : Fragment(), RobotLifecycleCallbacks {
             try {
                 SayBuilder.with(context)
                     .withLocale(localeFR)
-                    .withText("Brrr… J’ai un petit coup de mou. Est-ce que je pourrais avoir un gros câlin ? Viens me serrer fort, s’il te plaît !")
+                    .withText("Je me sens comme le monstre gris… j’ai un peu peur et un petit coup de mou. " +
+                            "Est-ce que je pourrais avoir un gros câlin ? Viens me serrer fort, s’il te plaît… j’en ai bien besoin."
+                    )
                     .build().run()
 
                 val anim = AnimationBuilder.with(context)

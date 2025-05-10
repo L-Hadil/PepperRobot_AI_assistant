@@ -30,68 +30,48 @@ class PepperStoryFragment : Fragment(), RobotLifecycleCallbacks {
     private val localeFR = Locale(Language.FRENCH, Region.FRANCE)
 
     private val storyLines = listOf(
-        "Bonjour, je m'appelle Pepper.",
-        "Je suis un petit robot tout blanc.",
-        "Je vis dans une grande maison de robots.",
-        "Là-bas, il y a Madalina.",
-        "C'est la maman d'Elisa, votre camarade.",
-        "Et il y a Hadil.",
-        "Madalina dit : « Les enfants, c'est magique ! »",
-        "Moi aussi, j'aime beaucoup les enfants !",
-        "Dans ma maison, il y a une grande étagère pleine d'histoires.",
-        "Chaque matin, Madalina me lit une petite histoire.",
-        "Hadil la garde bien dans ma tête.",
-        "Petit à petit, ma tête se remplit d'histoires rigolotes.",
-        "Quand je connais bien une histoire, je la garde bien au chaud.",
-        "Un jour, Madalina dit : « Pepper, va raconter tes histoires ! »",
-        "Hadil dit : « Et fais bien attention aux enfants. »",
-        "Alors on a mis mes roues, et je suis parti vers vous.",
-        "Me voilà aujourd'hui dans votre école.",
-        "Mes histoires sautent dans ma tête, prêtes à sortir.",
-        "Je peux parler pour raconter.",
-        "Je peux écouter pour apprendre.",
-        "Quand vous riez, je suis très content.",
-        "Quand vous chuchotez, je tends bien mes oreilles.",
-        "Ce soir, je dirai à mes autres amis robots :",
-        "« J'ai raconté plein d'histoires aux enfants aujourd'hui ! »",
-        "Demain, je reviendrai avec encore plus d'histoires.",
-        "Amusez-vous bien avec mes histoires,",
-        "et faites-moi des gros câlins, car j'adore ça !"
-
-
-
+        "Bonjour les enfants ! C'est mon tour de me présenter.",
+        "Vous savez quoi ? Aujourd’hui, je suis trop content d’être ici avec vous !",
+        "Et vous savez pourquoi je suis là ? C’est grâce à Madalina… la maman d’Elisa, votre camarade !",
+        "Oui oui, c’est vrai !",
+        "Un jour, pendant que je me reposais dans un coin, j’ai entendu une voix douce me dire :",
+        "— “Pepper, tu veux venir avec moi à l’école des enfants ?”",
+        "Moi, j’ai tourné ma tête, clignoté des yeux et j’ai dit :",
+        "— “Ooooh oui ! Moi, j’adoooore les enfants !”",
+        "Alors Madalina m’a pris par la main (enfin, par le bras… je suis un robot, hein !)",
+        "Elle m’a dit : “Tu vas voir, ils sont gentils, ils aiment les histoires, les câlins… et parfois même les robots !”",
+        "Et puis il y a Hadil qui m’a appris toutes ces histoires.",
+        "Ooh je peux vous dire qu’elle est très forte en mathématiques cette fille.",
+        "Et me voilà ! Devant vous, dans cette classe, avec vous tous !",
+        "Je suis un tout petit peu nerveux…",
+        "Parce que c’est ma première fois à l’école avec des enfants humains !",
+        "Mais j’ai une question très importante…",
+        "Est-ce que vous voulez que je vous raconte des histoires intéressantes ?",
+        "Une histoire sur les émotions, puis une histoire sur un mammouth et ses amis ?"
     )
+
 
     private val animationsByLine = listOf(
-        "animations/01-Hello/Hello_03.qianim",            // 1
-        "animations/07-Reactions/NiceReaction_01.qianim", // 2
-        "animations/05-Enumeration/Enumeration_01.qianim",// 3
-        "animations/Solitaries/LookHandRight_01.qianim",  // 4
-        "animations/Solitaries/LookHandLeft_01.qianim",   // 5
-        "animations/08-Attract/Attract_R03.qianim",       // 6
-        "animations/07-Reactions/Happy_01.qianim",        // 7 (if exists)
-        null,                                             // 8
-        null,                                             // 9
-        "animations/07-Reactions/NiceReaction_02.qianim", // 10
-        "animations/02-Body_Parts/Show_Hand_Both_01.qianim",//11
-        "animations/04-Make_Space/Make_Space_02.qianim",  //12
-        "animations/02-Body_Parts/Show_Body_01.qianim",   //13
-        null,                                             //14
-        null,                                             //15
-        "animations/03-Tablet/Show_Tablet_01.qianim",     //16
-        null,                                             //17
-        "animations/06-Solitaries/Looking_around_01.qianim",//18
-        "animations/07-Reactions/SadReaction_01.qianim",  //19
-        "animations/07-Reactions/Funny_01.qianim",        //20
-        null,                                             //21
-        "animations/07-Reactions/Success_01.qianim",      //22
-        "animations/05-Enumeration/Enumeration_02.qianim",//23
-        "animations/05-Enumeration/Enumeration_01.qianim",//24
-        "animations/07-Reactions/NiceReaction_01.qianim", //25
-        null,                                             //26
-        "animations/07-Reactions/Success_01.qianim",      //27
-        "animations/06-Solitaries/PlayWithHandBoth_01.qianim"//28
+        "animations/01-Hello/Hello_01.qianim",                     // Présentation
+        "animations/07-Reactions/Happy_01.qianim",                 // Content
+        "animations/06-Solitaries/LookHandLeft_01.qianim",         // Parler de Madalina
+        "animations/07-Reactions/NiceReaction_01.qianim",          // Oui oui !
+        "animations/06-Solitaries/Looking_around_01.qianim",       // Voix douce
+        "animations/06-Solitaries/LookLeft_01.qianim",             // Citation
+        "animations/06-Solitaries/LookRight_01.qianim",            // Tourner tête
+        "animations/07-Reactions/Funny_01.qianim",                 // Enthousiasme
+        "animations/02-Body_Parts/Show_Hand_Both_01.qianim",       // Bras robot
+        "animations/07-Reactions/NiceReaction_02.qianim",          // Description des enfants
+        "animations/06-Solitaries/LookHandRight_01.qianim",        // Parler de Hadil
+        "animations/07-Reactions/Success_01.qianim",               // Fort en maths
+        "animations/01-Hello/Hello_03.qianim",                     // Arrivée en classe
+        "animations/07-Reactions/SadReaction_01.qianim",           // Nervosité
+        "animations/06-Solitaries/LookBumpersLeft_01.qianim",      // Première fois
+        "animations/06-Solitaries/LookAtSidesRight_01.qianim",     // Question importante
+        "animations/05-Enumeration/Enumeration_01.qianim",         // Question 1
+        "animations/05-Enumeration/Enumeration_02.qianim"          // Question 2
     )
+
 
     override fun onCreateView(
         inflater: LayoutInflater,

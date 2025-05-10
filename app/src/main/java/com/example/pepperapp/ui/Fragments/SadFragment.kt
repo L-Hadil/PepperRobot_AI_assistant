@@ -59,7 +59,8 @@ class SadFragment : Fragment(), RobotLifecycleCallbacks {
                 val sayJob = async {
                     SayBuilder.with(context)
                         .withLocale(localeFR)
-                        .withText("Oh… je me sens vraiment triste. Peux-tu me caresser la tête, s’il te plaît ?")
+                        .withText("Oh… je me sens triste, comme le monstre bleu. Mon cœur est tout mou... Est-ce que tu peux me caresser la tête, s’il te plaît ? Ça me ferait du bien."
+                        )
                         .build()
                         .run()
                 }

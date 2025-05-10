@@ -48,7 +48,7 @@
     <!-- 3.b Histoire du Nuage -->
     <fragment
         android:id="@+id/NuageFragment"
-        android:name="com.example.pepperapp.ui.Fragments.NuageFragment"
+        android:name="com.example.pepperapp.ui.Fragments.MonstreDesEmotionsFragment"
         android:label="Histoire du Nuage"
         tools:layout="@layout/fragment_listen_story" />
 

@@ -10,14 +10,14 @@
         android:id="@+id/imageSadBackground"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:src="@drawable/animal2"
+        android:src="@drawable/sad"
         android:scaleType="fitCenter"
         android:adjustViewBounds="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
-
+z
     <!-- Bouton de retour, positionné en haut à gauche avec un peu de marge -->
     <Button
         android:id="@+id/buttonBack"

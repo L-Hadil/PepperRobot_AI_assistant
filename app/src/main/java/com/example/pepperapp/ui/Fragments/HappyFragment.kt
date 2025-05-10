@@ -60,9 +60,9 @@ class HappyFragment : Fragment(), RobotLifecycleCallbacks {
                     SayBuilder.with(context)
                         .withLocale(localeFR)
                         .withText(
-                            "Je suis heureux d’être avec toi. " +
-                                    "Si tu es aussi content, " +
-                                    "prend ma main droite et ma main gauche !"
+                            "Je me sens comme le monstre jaune… plein de joie ! Je suis tellement heureux d’être avec toi. " +
+                                    "Et toi ? Si tu es content aussi, prends ma main droite… puis ma main gauche !"
+
                         )
                         .build()
                         .run()

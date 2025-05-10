@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,67 +6,66 @@
 
     <!-- Image en fond -->
     <ImageView
-        android:id="@+id/imageAnimalBackground"
+        android:id="@+id/imageSadBackground"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/animal1"
+        android:src="@drawable/couleur"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Conteneur de boutons, centré horizontalement et placé à 70% de la hauteur -->
-    <LinearLayout
-        android:id="@+id/buttonContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        app:layout_constraintStart_toStartOf="parent"
+    <!-- Bouton BYEBYE (haut droit) -->
+    <Button
+        android:id="@+id/buttonByebye"
+        android:layout_width="200dp"
+        android:layout_height="64dp"
+        android:background="@drawable/button_background"
+        android:text="BYEBYE"
+        android:textColor="#000"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0.7">
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="16dp" />
 
-        <Button
-            android:id="@+id/buttonSad"
-            android:layout_width="200dp"
-            android:layout_height="64dp"
-            android:text="Sad"
-            android:background="@drawable/button_background"
-            android:textColor="#000"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"/>
+    <!-- Bouton PEUR -->
+    <Button
+        android:id="@+id/buttonHug"
+        android:layout_width="200dp"
+        android:layout_height="64dp"
+        android:background="@drawable/button_background"
+        android:text="PEUR"
+        android:textColor="#000"
+        app:layout_constraintTop_toBottomOf="@id/buttonByebye"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="16dp" />
 
-        <Button
-            android:id="@+id/buttonHappy"
-            android:layout_width="200dp"
-            android:layout_height="64dp"
-            android:text="Happy"
-            android:background="@drawable/button_background"
-            android:textColor="#000"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"/>
+    <!-- Bouton TRISTESSE -->
+    <Button
+        android:id="@+id/buttonSad"
+        android:layout_width="200dp"
+        android:layout_height="64dp"
+        android:background="@drawable/button_background"
+        android:text="TRISTESSE"
+        android:textColor="#000"
+        app:layout_constraintTop_toBottomOf="@id/buttonHug"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="16dp" />
 
-        <Button
-            android:id="@+id/buttonHug"
-            android:layout_width="200dp"
-            android:layout_height="64dp"
-            android:text="Hug"
-            android:background="@drawable/button_background"
-            android:textColor="#000"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"/>
-
-        <Button
-            android:id="@+id/buttonByebye"
-            android:layout_width="200dp"
-            android:layout_height="64dp"
-            android:text="Byebye"
-            android:background="@drawable/button_background"
-            android:textColor="#000"
-            android:textStyle="bold"/>
-    </LinearLayout>
+    <!-- Bouton JOIE (plus bas) -->
+    <Button
+        android:id="@+id/buttonHappy"
+        android:layout_width="200dp"
+        android:layout_height="64dp"
+        android:background="@drawable/button_background"
+        android:text="JOIE"
+        android:textColor="#000"
+        app:layout_constraintTop_toBottomOf="@id/buttonSad"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

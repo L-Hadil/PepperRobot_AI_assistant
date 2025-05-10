@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/chatContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,11 +16,11 @@
         android:id="@+id/chatTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="pose ta question et pepper va te répondre"
+        android:text="Pose ta question et Pepper va te répondre"
         android:textSize="24sp"
         android:textStyle="bold"
         android:layout_gravity="center_horizontal"
-        android:textColor="#333333"
+        android:textColor="@android:color/black"
         android:layout_marginBottom="8dp" />
 
     <!-- Zone de messages -->
@@ -44,7 +45,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingTop="8dp">
+        android:paddingTop="8dp"
+        android:gravity="center_vertical">
 
         <EditText
             android:id="@+id/editTextQuestion"
@@ -52,12 +54,29 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="Tapez votre question..."
-            android:inputType="text" />
+            android:inputType="text"
+            android:imeOptions="actionSend"
+            android:textColor="@android:color/black"
+            android:textColorHint="#888888" />
+
+        <!-- Bouton Micro pour la reconnaissance vocale -->
+        <ImageButton
+            android:id="@+id/buttonMic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_btn_speak_now"
+            android:contentDescription="Microphone"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:layout_marginStart="8dp"
+            app:tint="@android:color/black" />
 
         <Button
             android:id="@+id/buttonSendQuestion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Envoyer" />
+            android:text="Envoyer"
+            android:layout_marginStart="8dp"
+            android:textColor="@android:color/black"/>
     </LinearLayout>
 </LinearLayout>

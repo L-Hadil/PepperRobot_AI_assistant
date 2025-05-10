@@ -10,7 +10,7 @@
         android:id="@+id/imageSadBackground"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:src="@drawable/animal4"
+        android:src="@drawable/joie"
         android:scaleType="fitCenter"
         android:adjustViewBounds="true"
         app:layout_constraintTop_toTopOf="parent"
