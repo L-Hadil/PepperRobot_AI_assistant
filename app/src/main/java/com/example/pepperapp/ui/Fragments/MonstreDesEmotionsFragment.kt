@@ -64,11 +64,17 @@ class MonstreDesEmotionsFragment : Fragment(), RobotLifecycleCallbacks {
         "La peur te fait tout petit, comme une souris.",
         "Moi, j’ai déjà eu peur d’un aspirateur ! Et vous ?",
 
-        "Et enfin… il y a le calme.",
+        "Et ensuite… il y a le calme.",
         "Il est vert, comme les feuilles d’un arbre.",
         "C’est quand tu es bien, que tu respires doucement, que tu écoutes une histoire.",
         "Le calme, c’est doux comme un câlin.",
         "Fermez les yeux, respirez doucement… vous sentez le calme ?",
+
+        "Mais il y a encore une émotion très spéciale : l’amour.",
+        "L’amour est rose, comme un bisou ou un cœur.",
+        "C’est quand ton cœur est tout chaud, que tu penses fort à quelqu’un que tu aimes.",
+        "L’amour, c’est quand tu fais un câlin, ou que tu tiens la main de quelqu’un.",
+        "Et vous ? À qui avez-vous envie de dire 'je t’aime' aujourd’hui ?",
 
         "Alors le monstre a tout rangé.",
         "Une couleur pour chaque émotion.",
@@ -119,12 +125,19 @@ class MonstreDesEmotionsFragment : Fragment(), RobotLifecycleCallbacks {
         "animations/02-Body_Parts/Show_Body_03.qianim",          // Câlin
         null,                                                    // Fermez les yeux
 
+        "animations/07-Reactions/NiceReaction_01.qianim",        // Amour (ajout)
+        "animations/01-Hello/Hello_04.qianim",                   // Rose comme un bisou
+        "animations/06-Solitaries/PlayWithHandBoth_01.qianim",   // Cœur chaud, câlin
+        "animations/02-Body_Parts/Show_Hand_Both_01.qianim",     // Tenir la main
+        null,                                                    // Je t’aime
+
         "animations/05-Enumeration/Enumeration_01.qianim",       // Rangement final
         null,                                                    // Une couleur pour chaque émotion
         "animations/07-Reactions/NiceReaction_02.qianim",        // Monstre soulagé
         null,                                                    // Et vous ?
         "animations/05-Enumeration/Enumeration_02.qianim"        // Quelle est ta couleur ?
     )
+
 
 
 

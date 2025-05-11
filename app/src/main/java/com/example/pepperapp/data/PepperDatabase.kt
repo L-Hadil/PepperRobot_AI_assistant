@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.pepperapp.model.UserProfile
 
-@Database(entities = [UserProfile::class], version = 8)
+@Database(entities = [UserProfile::class], version = 9)
 abstract class PepperDatabase : RoomDatabase() {
 
     abstract fun userProfileDao(): UserProfileDao

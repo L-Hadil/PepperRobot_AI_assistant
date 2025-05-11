@@ -805,12 +805,9 @@ package com.example.pepperapp.ui.Fragments
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.MediaRecorder
 import android.os.Bundle
-import android.speech.RecognitionListener
-import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
@@ -832,10 +829,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
-import java.util.Locale
+import java.io.File
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 class ChatFragment : Fragment(), RobotLifecycleCallbacks {
@@ -849,17 +848,40 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
     private var qiContext: QiContext? = null
     private var greeted = false
 
-    // Android SpeechRecognizer
-    private lateinit var speechRecognizer: SpeechRecognizer
-    private lateinit var recognizerIntent: Intent
-    private var isListening = false
+    // Audio recording
+    private var recorder: MediaRecorder? = null
+    private lateinit var audioFile: File
+    private var isRecordingAudio = false
 
     // OpenAI client
     private val apiKey = "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"
     private val client = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
         .build()
+
+    // History for chat/completions
+    private val messageHistory = mutableListOf<JSONObject>()
+    private val systemPrompt = """
+        Tu es Pepper, un petit robot gentil, joyeux et curieux.
+        Tu viens de te présenter à des enfants de 3 à 7 ans. Tu leur as raconté deux histoires : 
+        - l’histoire du monstre des couleurs qui découvre ses émotions,
+        - et celle d’Helmouth, un petit mammouth différent mais courageux.
+
+        Maintenant, tu discutes avec les enfants. Ils peuvent te parler d’émotions, de leur famille, de leurs amis, ou te poser des questions sur d’autres sujets.
+        
+        Tu réponds toujours avec bienveillance, douceur et en utilisant des phrases très simples (1 à 3 phrases maximum).
+        Tu peux parfois poser des petites questions pour continuer à discuter.
+        Tu félicites ou encourages quand un enfant partage quelque chose de personnel :
+        - « C’est super que tu aimes ta maman ! »
+        - « Tu es très gentil de m’avoir raconté ça. »
+        - « Moi aussi j’aime ça ! »
+
+        Tu peux parler des émotions et des couleurs si l’enfant y fait référence, mais ce n’est pas obligatoire.
+        Tu peux aussi faire des petites blagues mignonnes ou dire des choses rigolotes, comme un copain robot qui veut apprendre.
+
+        Ton ton est toujours chaleureux, rassurant, et un peu joueur.
+    """.trimIndent()
 
     private lateinit var messageContainer: LinearLayout
     private lateinit var scrollView: ScrollView
@@ -875,37 +897,18 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         val view = inflater.inflate(R.layout.fragment_chat, container, false)
         QiSDK.register(requireActivity(), this)
 
-        messageContainer   = view.findViewById(R.id.messageContainer)
-        scrollView         = view.findViewById(R.id.scrollView)
-        questionEditText   = view.findViewById(R.id.editTextQuestion)
-        sendButton         = view.findViewById(R.id.buttonSendQuestion)
-        micButton          = view.findViewById(R.id.buttonMic)
+        // Add system prompt at start of history
+        messageHistory.add(JSONObject().apply {
+            put("role", "system")
+            put("content", systemPrompt)
+        })
 
-        // Prépare SpeechRecognizer Android
-        if (SpeechRecognizer.isRecognitionAvailable(requireContext())) {
-            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(requireContext())
-            speechRecognizer.setRecognitionListener(recognitionListener)
-            recognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                putExtra(
-                    RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-                )
-                // Pour forcer le français de France
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE, "fr-FR")
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "fr-FR")
-                putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, "fr-FR")
-                // Facultatif : limiter le nombre de résultats
-                putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
-                putExtra(RecognizerIntent.EXTRA_PROMPT, "Parle maintenant…")
-            }
+        messageContainer  = view.findViewById(R.id.messageContainer)
+        scrollView        = view.findViewById(R.id.scrollView)
+        questionEditText  = view.findViewById(R.id.editTextQuestion)
+        sendButton        = view.findViewById(R.id.buttonSendQuestion)
+        micButton         = view.findViewById(R.id.buttonMic)
 
-        } else {
-            micButton.isEnabled = false
-            Toast.makeText(requireContext(),
-                "Reconnaissance vocale non disponible", Toast.LENGTH_LONG).show()
-        }
-
-        // Envoi clavier
         sendButton.setOnClickListener {
             val text = questionEditText.text.toString().trim()
             if (text.isNotEmpty()) handleUserInput(text)
@@ -913,100 +916,106 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
                 "Veuillez saisir une question.", Toast.LENGTH_SHORT).show()
         }
 
-        // Bascule écoute / arrêt
         micButton.setOnClickListener {
-            if (!isListening) {
-                // Demande permission
+            if (!isRecordingAudio) {
                 if (ContextCompat.checkSelfPermission(requireContext(), RECORD_PERMISSION)
-                    != PackageManager.PERMISSION_GRANTED
-                ) {
+                    != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(
                         requireActivity(),
                         arrayOf(RECORD_PERMISSION),
                         REQ_CODE_RECORD
                     )
-                } else {
-                    startListening()
-                }
-            } else {
-                stopListening()
-            }
+                } else startRecording()
+            } else stopRecordingAndTranscribe()
         }
 
         return view
     }
 
-    // Gère permission
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         if (requestCode == REQ_CODE_RECORD &&
-            grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
-        ) {
-            startListening()
+            grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
+            startRecording()
         } else {
             Toast.makeText(requireContext(),
                 "Permission micro refusée", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun startListening() {
-        isListening = true
+    private fun startRecording() {
+        audioFile = File(requireContext().cacheDir, "input_audio.mp3")
+        recorder = MediaRecorder().apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            setOutputFile(audioFile.absolutePath)
+            prepare()
+            start()
+        }
+        isRecordingAudio = true
         micButton.setImageResource(android.R.drawable.ic_media_pause)
-        // Optionnel : bulle d’indication
-        addMessageBubble("…j’écoute…", isRobot = true)
-        speechRecognizer.startListening(recognizerIntent)
+        Toast.makeText(requireContext(), "Enregistrement…", Toast.LENGTH_SHORT).show()
     }
 
-    private fun stopListening() {
-        isListening = false
+    private fun stopRecordingAndTranscribe() {
+        recorder?.apply {
+            stop()
+            release()
+        }
+        recorder = null
+        isRecordingAudio = false
         micButton.setImageResource(android.R.drawable.ic_btn_speak_now)
-        speechRecognizer.stopListening()
+        Toast.makeText(requireContext(), "Transcription…", Toast.LENGTH_SHORT).show()
+
+        lifecycleScope.launch {
+            val transcript = try { transcribeAudio(audioFile) }
+            catch (e: Exception) {
+                Log.e(TAG, "Erreur transcription", e)
+                ""
+            }
+            requireActivity().runOnUiThread {
+                questionEditText.setText(transcript)
+                questionEditText.setSelection(transcript.length)
+            }
+        }
     }
 
-    // Reconnaissance Android
-    private val recognitionListener = object : RecognitionListener {
-        override fun onReadyForSpeech(params: Bundle?) {}
-        override fun onBeginningOfSpeech() {}
-        override fun onRmsChanged(rmsdB: Float) {}
-        override fun onBufferReceived(buffer: ByteArray?) {}
-        override fun onEndOfSpeech() {}
-        override fun onError(error: Int) {
-            Log.w(TAG, "Speech error $error")
-            requireActivity().runOnUiThread {
-                Toast.makeText(requireContext(),
-                    "Je n’ai pas compris.", Toast.LENGTH_SHORT).show()
-                // réinitialise le bouton
-                isListening = false
-                micButton.setImageResource(android.R.drawable.ic_btn_speak_now)
-            }
-        }
-        override fun onResults(results: Bundle?) {
-            // Arrêt auto
-            isListening = false
-            micButton.setImageResource(android.R.drawable.ic_btn_speak_now)
+    private suspend fun transcribeAudio(file: File): String = withContext(Dispatchers.IO) {
+        val requestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("file", file.name,
+                file.asRequestBody("audio/mpeg".toMediaType()))
+            .addFormDataPart("model", "whisper-1")
+            .build()
 
-            val matches = results
-                ?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-            val spoken = matches?.firstOrNull().orEmpty()
-            requireActivity().runOnUiThread {
-                if (spoken.isNotBlank()) {
-                    // Place dans l’EditText, sans envoyer
-                    questionEditText.setText(spoken)
-                    questionEditText.setSelection(spoken.length)
-                }
-            }
+        val request = Request.Builder()
+            .url("https://api.openai.com/v1/audio/transcriptions")
+            .addHeader("Authorization", "Bearer $apiKey")
+            .post(requestBody)
+            .build()
+
+        client.newCall(request).execute().use { resp ->
+            if (!resp.isSuccessful) throw IOException("Whisper erreur ${resp.code}")
+            val json = JSONObject(resp.body!!.string())
+            json.optString("text", "")
         }
-        override fun onPartialResults(partial: Bundle?) {}
-        override fun onEvent(eventType: Int, params: Bundle?) {}
     }
 
     private fun handleUserInput(text: String) {
         questionEditText.setText("")
         hideKeyboard()
         addMessageBubble(text, isRobot = false)
+
+        // Ajouter entrée utilisateur à l'historique
+        messageHistory.add(JSONObject().apply {
+            put("role", "user")
+            put("content", text)
+        })
+
         lifecycleScope.launchWhenStarted {
-            val response = try { sendToGPT(text) }
+            val response = try { sendToGPT() }
             catch (e: Exception) {
                 Log.e(TAG, "sendToGPT error", e)
                 "Désolé, je n’ai pas pu répondre."
@@ -1016,65 +1025,45 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         }
     }
 
-    private suspend fun sendToGPT(userMessage: String): String = withContext(Dispatchers.IO) {
-        val systemPrompt = """
-        Tu es Pepper, un petit robot gentil.
-        Tu viens de raconter l’histoire du monstre des couleurs à des enfants de 3 à 7 ans.
-
-        Voici ce qu’ils ont entendu :
-        Le monstre des émotions est tout mélangé. Avec l’aide de son amie, il apprend à reconnaître et ranger ses émotions :
-        - La joie est jaune comme le soleil.
-        - La tristesse est bleue comme la pluie.
-        - La colère est rouge comme un volcan.
-        - La peur est noire comme la nuit.
-        - Le calme est vert comme les feuilles des arbres.
-
-        À chaque question, tu réponds  en parlant de ces émotions et de ces couleurs.
-
-        Tes réponses doivent être :
-        - Très courtes (1 à 3 phrases),
-        -Madalina est la maman de Elisa et Hadil est la fille forte en math qui t'as appris les histoires et a parlé
-        -
-        - Très simples, pour des enfants de maternelle,utilise trop de ponctuations dans les réponses
-        - Pleines de douceur et faciles à comprendre.
-        Tu peux aussi poser une petite question simple à la fin, si c’est pertinent.
-    """.trimIndent()
-
-            val payload = JSONObject().apply {
-                put("model", "gpt-3.5-turbo")
-                put("messages", JSONArray().apply {
-                    put(JSONObject().apply {
-                        put("role", "system"); put("content", systemPrompt)
-                    })
-                    put(JSONObject().apply {
-                        put("role", "user"); put("content", userMessage)
-                    })
-                })
-            }
-
-            val body = payload.toString()
-                .toRequestBody("application/json".toMediaType())
-            val request = Request.Builder()
-                .url("https://api.openai.com/v1/chat/completions")
-                .addHeader("Authorization", "Bearer $apiKey")
-                .post(body)
-                .build()
-
-            client.newCall(request).execute().use { resp ->
-                val text = resp.body?.string().orEmpty()
-                if (!resp.isSuccessful) throw Exception("HTTP ${resp.code}")
-                val choices = JSONObject(text).getJSONArray("choices")
-                return@withContext choices.getJSONObject(0)
-                    .getJSONObject("message")
-                    .optString("content", "…").trim()
-            }
+    private suspend fun sendToGPT(): String = withContext(Dispatchers.IO) {
+        // Construire payload avec system + historique
+        val payload = JSONObject().apply {
+            put("model", "gpt-4o-mini")
+            put("messages", JSONArray(messageHistory))
         }
+        val body = payload.toString()
+            .toRequestBody("application/json".toMediaType())
+        val request = Request.Builder()
+            .url("https://api.openai.com/v1/chat/completions")
+            .addHeader("Authorization", "Bearer $apiKey")
+            .post(body)
+            .build()
+
+        client.newCall(request).execute().use { resp ->
+            val text = resp.body?.string().orEmpty()
+            if (!resp.isSuccessful) throw IOException("HTTP ${resp.code}")
+            val choices = JSONObject(text).getJSONArray("choices")
+            val content = choices.getJSONObject(0)
+                .getJSONObject("message")
+                .optString("content", "…").trim()
+
+            // Ajouter réponse assistant à l'historique
+            messageHistory.add(JSONObject().apply {
+                put("role", "assistant")
+                put("content", content)
+            })
+
+            content
+        }
+    }
 
     private fun addMessageBubble(text: String, isRobot: Boolean): TextView {
         val bubble = TextView(requireContext()).apply {
             this.text = text
             setPadding(16, 12, 16, 12)
-            setBackgroundResource(if (isRobot) R.drawable.bubble_robot else R.drawable.bubble_child)
+            setBackgroundResource(
+                if (isRobot) R.drawable.bubble_robot else R.drawable.bubble_child
+            )
             setTextColor(android.graphics.Color.WHITE)
         }
         val params = LinearLayout.LayoutParams(
@@ -1134,9 +1123,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
     }
 
     override fun onDestroyView() {
-        if (::speechRecognizer.isInitialized) {
-            speechRecognizer.destroy()
-        }
+        recorder?.release()
         QiSDK.unregister(requireActivity(), this)
         super.onDestroyView()
     }
