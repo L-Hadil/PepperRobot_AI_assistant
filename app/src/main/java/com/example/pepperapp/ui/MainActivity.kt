@@ -6,9 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.aldebaran.qi.sdk.QiContext
 import com.aldebaran.qi.sdk.QiSDK
 import com.aldebaran.qi.sdk.RobotLifecycleCallbacks
-import com.example.pepperapp.ui.Fragments.ProfileFragment
 import com.example.pepperapp.R
-import com.example.pepperapp.ui.Fragments.StartChildFragment
 
 class MainActivity : AppCompatActivity(), RobotLifecycleCallbacks {
 
@@ -31,10 +29,7 @@ class MainActivity : AppCompatActivity(), RobotLifecycleCallbacks {
     override fun onRobotFocusGained(qiContext: QiContext) {
         this.qiContext = qiContext
 
-        val fragment = supportFragmentManager.findFragmentById(R.id.container)
-        if (fragment is ProfileFragment) {
-            fragment.setQiContext(qiContext)
-        }
+
     }
 
     override fun onRobotFocusLost() {

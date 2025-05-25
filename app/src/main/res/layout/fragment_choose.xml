@@ -4,9 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Image en fond -->
 
-    <!-- Colonne de boutons par-dessus -->
     <ImageView
         android:id="@+id/imageMamouthChoose"
         android:layout_width="match_parent"

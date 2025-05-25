@@ -42,7 +42,7 @@ class HugFragment : Fragment(), RobotLifecycleCallbacks {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // S'enregistrer pour recevoir les callbacks QiSDK
+
         QiSDK.register(requireActivity(), this)
         return inflater.inflate(R.layout.fragment_hug, container, false)
     }
@@ -57,7 +57,7 @@ class HugFragment : Fragment(), RobotLifecycleCallbacks {
     override fun onRobotFocusGained(context: QiContext) {
         qiContext = context
 
-        // 1) Invitation au câlin
+
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 SayBuilder.with(context)
@@ -79,7 +79,7 @@ class HugFragment : Fragment(), RobotLifecycleCallbacks {
             }
         }
 
-        // 2) Configurer les capteurs Head, main droite et main gauche
+
         try {
             headSensor = context.touch.getSensor("Head/Touch").also { sensor ->
                 sensor.addOnStateChangedListener { state ->
@@ -102,7 +102,7 @@ class HugFragment : Fragment(), RobotLifecycleCallbacks {
     }
 
     override fun onRobotFocusLost() {
-        // Désinscrire les listeners pour éviter les fuites
+
         headSensor?.removeAllOnStateChangedListeners()
         rightHandSensor?.removeAllOnStateChangedListeners()
         leftHandSensor?.removeAllOnStateChangedListeners()

@@ -30,7 +30,7 @@ class ChooseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Pepper parle en français dès que le fragment est prêt
+
         (activity as? MainActivity)?.getQiContext()?.let { ctx ->
             lifecycleScope.launch(Dispatchers.IO) {
                 SayBuilder.with(ctx)
@@ -42,7 +42,7 @@ class ChooseFragment : Fragment() {
             }
         }
 
-        // Navigation vers ListenStory
+
         view.findViewById<Button>(R.id.buttonListenStory).setOnClickListener {
             findNavController().navigate(R.id.action_chooseFragment_to_storySelectionFragment)
 

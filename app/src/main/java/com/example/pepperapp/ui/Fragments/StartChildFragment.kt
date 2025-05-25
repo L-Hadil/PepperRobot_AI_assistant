@@ -32,14 +32,14 @@ class StartChildFragment : Fragment(), RobotLifecycleCallbacks {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Enregistrer pour recevoir les callbacks du robot
+
         QiSDK.register(requireActivity(), this)
         return inflater.inflate(R.layout.fragment_start_child, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Bouton "Start" pour naviguer vers ChooseFragment
+
         view.findViewById<Button>(R.id.buttonStart).setOnClickListener {
             findNavController().navigate(R.id.action_startChildFragment_to_chooseFragment)
         }
@@ -47,20 +47,20 @@ class StartChildFragment : Fragment(), RobotLifecycleCallbacks {
 
     override fun onRobotFocusGained(context: QiContext) {
         qiContext = context
-        // Dès que Pepper est prêt, lancer paroles et animations
+
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // 1) Animation de salutation
+
                 val helloAnim: Animation = AnimationBuilder.with(context)
                     .withAssets("animations/01-Hello/Hello_03.qianim")
                     .build()
                 val helloAction = AnimateBuilder.with(context)
                     .withAnimation(helloAnim)
                     .build()
-                // Lancer l'animation en asynchrone
+
                 helloAction.async().run()
 
-                // 2) Préparer et lancer la parole
+
                 val text = """
 Bonjour les enfants! Je suis Pepper, votre robot préféré pour raconter des histoires. Aujourd'hui, je suis avec vous pour raconter une très belle histoire. Vous allez voir que vous allez adorer! Êtes-vous prêts? Je veux que vous m'écoutiez bien, car à la fin, je serai très ravi de faire votre connaissance.
 """.trimIndent()
@@ -79,7 +79,7 @@ Bonjour les enfants! Je suis Pepper, votre robot préféré pour raconter des hi
                     .build()
                     .run()
 
-                // 4) Regarder à droite puis à gauche
+
                 listOf("LookRight_01.qianim", "LookLeft_01.qianim").forEach { file ->
                     val anim = AnimationBuilder.with(context)
                         .withAssets("animations/06-Solitaries/$file")
@@ -97,16 +97,16 @@ Bonjour les enfants! Je suis Pepper, votre robot préféré pour raconter des hi
     }
 
     override fun onRobotFocusLost() {
-        // Libérer le contexte
+
         qiContext = null
     }
 
     override fun onRobotFocusRefused(reason: String?) {
-        // Gérer le refus si nécessaire
+
     }
 
     override fun onDestroyView() {
-        // Se désinscrire des callbacks
+
         QiSDK.unregister(requireActivity())
         super.onDestroyView()
     }

@@ -36,7 +36,7 @@ class SadFragment : Fragment(), RobotLifecycleCallbacks {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // S'enregistrer pour recevoir les callbacks QiSDK
+
         QiSDK.register(requireActivity(), this)
         return inflater.inflate(R.layout.fragment_sad, container, false)
     }
@@ -44,7 +44,7 @@ class SadFragment : Fragment(), RobotLifecycleCallbacks {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Retour
+
         view.findViewById<Button>(R.id.buttonBack).setOnClickListener {
             findNavController().popBackStack()
         }
@@ -53,7 +53,6 @@ class SadFragment : Fragment(), RobotLifecycleCallbacks {
     override fun onRobotFocusGained(context: QiContext) {
         qiContext = context
 
-        // 1) jouer l'émotion triste
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val sayJob = async {
@@ -80,7 +79,7 @@ class SadFragment : Fragment(), RobotLifecycleCallbacks {
             }
         }
 
-        // 2) configurer le capteur tête
+
         try {
             headSensor = context.touch.getSensor("Head/Touch").also { sensor ->
                 sensor.addOnStateChangedListener { state ->
@@ -93,7 +92,7 @@ class SadFragment : Fragment(), RobotLifecycleCallbacks {
     }
 
     override fun onRobotFocusLost() {
-        // désinscrire le listener tactile
+
         headSensor?.removeAllOnStateChangedListeners()
         headSensor = null
         qiContext = null

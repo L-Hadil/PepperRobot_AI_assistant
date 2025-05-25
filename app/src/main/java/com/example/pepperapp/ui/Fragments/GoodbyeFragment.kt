@@ -40,16 +40,16 @@ class GoodbyeFragment : Fragment(), RobotLifecycleCallbacks {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Pas de bouton retour : on quitte l’activité ou on navigue ailleurs après l’au revoir
+
     }
 
     override fun onRobotFocusGained(context: QiContext) {
         qiContext = context
 
-        // 1) Phrase d’au revoir mignonne + animation de la main
+
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // 1.a) Dire au revoir
+
                 val sayJob = async {
                     SayBuilder.with(context)
                         .withLocale(localeFR)
@@ -63,7 +63,7 @@ class GoodbyeFragment : Fragment(), RobotLifecycleCallbacks {
                         .run()
                 }
 
-                // 1.b) Animation de la main qui fait « bye »
+
                 val waveAnim: Animation = AnimationBuilder.with(context)
                     .withAssets("animations/01-Hello/Hello_09.qianim")
                     .build()
@@ -74,7 +74,7 @@ class GoodbyeFragment : Fragment(), RobotLifecycleCallbacks {
                         .run()
                 }
 
-                // 1.c) Synchronisation
+
                 sayJob.await()
                 animJob.await()
 

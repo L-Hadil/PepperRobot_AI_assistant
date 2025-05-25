@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Fond plein écran -->
+
     <ImageView
         android:id="@+id/bgListenStory"
         android:layout_width="0dp"
@@ -18,7 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- CardView centré à 70% de la largeur et de la hauteur -->
+
     <androidx.cardview.widget.CardView
         android:id="@+id/cardContainer"
         android:layout_width="0dp"
@@ -40,7 +40,6 @@
 
 
 
-            <!-- Contenu qui défile -->
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"

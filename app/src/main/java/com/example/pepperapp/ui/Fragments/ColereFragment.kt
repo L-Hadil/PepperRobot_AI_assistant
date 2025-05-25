@@ -36,7 +36,7 @@ class ColereFragment : Fragment(), RobotLifecycleCallbacks {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // S'enregistrer pour recevoir les callbacks QiSDK
+
         QiSDK.register(requireActivity(), this)
         return inflater.inflate(R.layout.fragment_colere, container, false)
     }
@@ -44,7 +44,6 @@ class ColereFragment : Fragment(), RobotLifecycleCallbacks {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Retour
         view.findViewById<Button>(R.id.buttonBack).setOnClickListener {
             findNavController().popBackStack()
         }
@@ -53,7 +52,7 @@ class ColereFragment : Fragment(), RobotLifecycleCallbacks {
     override fun onRobotFocusGained(context: QiContext) {
         qiContext = context
 
-        // 1) jouer l'émotion triste
+
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val sayJob = async {
@@ -93,7 +92,7 @@ class ColereFragment : Fragment(), RobotLifecycleCallbacks {
     }
 
     override fun onRobotFocusLost() {
-        // désinscrire le listener tactile
+
         headSensor?.removeAllOnStateChangedListeners()
         headSensor = null
         qiContext = null

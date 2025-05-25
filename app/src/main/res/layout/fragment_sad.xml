@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Image de fond qui s'étend pour recouvrir les quatre bords, en gardant le centre -->
+
     <ImageView
         android:id="@+id/imageSadBackground"
         android:layout_width="0dp"
@@ -18,7 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 z
-    <!-- Bouton de retour, positionné en haut à gauche avec un peu de marge -->
+
     <Button
         android:id="@+id/buttonBack"
         android:layout_width="wrap_content"

@@ -85,57 +85,56 @@ class MonstreDesEmotionsFragment : Fragment(), RobotLifecycleCallbacks {
 
 
     private val animationsByLine = listOf(
-        "animations/01-Hello/Hello_02.qianim",                    // Intro du monstre
-        "animations/06-Solitaries/Funny_01.qianim",              // Monstre gentil mélangé
-        "animations/06-Solitaries/LookHandRight_01.qianim",      // Présentation du nom
-        "animations/07-Reactions/SadReaction_01.qianim",         // Réveil bizarre
-        "animations/06-Solitaries/Looking_around_01.qianim",     // Sentiment confus
-        null,                                                    // Citation de l’amie
-        "animations/06-Solitaries/LookHandLeft_01.qianim",       // “Tes émotions sont mélangées”
-        "animations/02-Body_Parts/Show_Hand_Both_01.qianim",     // Grosse tête qui dit oui
-        "animations/07-Reactions/NiceReaction_01.qianim",        // Ils commencent
+        "animations/01-Hello/Hello_02.qianim",
+        "animations/06-Solitaries/Funny_01.qianim",
+        "animations/06-Solitaries/LookHandRight_01.qianim",
+        "animations/07-Reactions/SadReaction_01.qianim",
+        "animations/06-Solitaries/Looking_around_01.qianim",
+        null,
+        "animations/06-Solitaries/LookHandLeft_01.qianim",
+        "animations/02-Body_Parts/Show_Hand_Both_01.qianim",
+        "animations/07-Reactions/NiceReaction_01.qianim",
 
-        "animations/07-Reactions/NiceReaction_01.qianim",        // La joie
-        "animations/01-Hello/Hello_04.qianim",                   // Jaune soleil
-        "animations/06-Solitaries/Funny_02.qianim",              // Goûter, amis
-        "animations/06-Solitaries/PlayWithHandBoth_01.qianim",   // Sauter partout
-        null,                                                    // Question ouverte
+        "animations/07-Reactions/NiceReaction_01.qianim",
+        "animations/01-Hello/Hello_04.qianim",
+        "animations/06-Solitaries/Funny_02.qianim",
+        "animations/06-Solitaries/PlayWithHandBoth_01.qianim",
+        null,
 
-        "animations/07-Reactions/SadReaction_01.qianim",         // Tristesse
-        "animations/06-Solitaries/LookDown_01.qianim",           // Bleue pluie
-        "animations/06-Solitaries/LookRight_01.qianim",          // Perdu doudou
-        "animations/07-Reactions/SadReaction_02.qianim",         // Larmes
-        null,                                                    // Moi aussi…
+        "animations/07-Reactions/SadReaction_01.qianim",
+        "animations/06-Solitaries/LookDown_01.qianim",
+        "animations/06-Solitaries/LookRight_01.qianim",
+        "animations/07-Reactions/SadReaction_02.qianim",
+        null,
 
-        "animations/04-Make_Space/Make_Space_02.qianim",         // Colère
-        "animations/01-Hello/Hello_05.qianim",                   // Rouge volcan (choix symbolique)
-        "animations/06-Solitaries/LookHandLeft_01.qianim",       // Crier
-        "animations/06-Solitaries/LookBumpersLeft_01.qianim",    // Attention à la colère
-        null,                                                    // Question ouverte
+        "animations/04-Make_Space/Make_Space_02.qianim",
+        "animations/01-Hello/Hello_05.qianim",
+        "animations/06-Solitaries/LookHandLeft_01.qianim",
+        "animations/06-Solitaries/LookBumpersLeft_01.qianim",
+        null,
 
-        "animations/06-Solitaries/LookFarLeft_01.qianim",        // Peur
-        "animations/06-Solitaries/LookBumpersRight_01.qianim",   // Noire nuit
-        "animations/06-Solitaries/LookAtSidesRight_01.qianim",   // Monstre sous le lit
-        "animations/06-Solitaries/LookHandRight_01.qianim",      // Tout petit
-        null,                                                    // Aspirateur
+        "animations/06-Solitaries/LookFarLeft_01.qianim",
+        "animations/06-Solitaries/LookBumpersRight_01.qianim",
+        "animations/06-Solitaries/LookAtSidesRight_01.qianim",
+        "animations/06-Solitaries/LookHandRight_01.qianim",
+        null,
 
-        "animations/07-Reactions/NiceReaction_01.qianim",        // Calme
-        "animations/07-Reactions/NiceReaction_02.qianim",        // Vert arbre
-        "animations/06-Solitaries/Looking_around_01.qianim",     // Respiration douce
-        "animations/02-Body_Parts/Show_Body_03.qianim",          // Câlin
-        null,                                                    // Fermez les yeux
+        "animations/07-Reactions/NiceReaction_01.qianim",
+        "animations/07-Reactions/NiceReaction_02.qianim",
+        "animations/06-Solitaries/Looking_around_01.qianim",
+        "animations/02-Body_Parts/Show_Body_03.qianim",
+        null,
+        "animations/07-Reactions/NiceReaction_01.qianim",
+        "animations/01-Hello/Hello_04.qianim",
+        "animations/06-Solitaries/PlayWithHandBoth_01.qianim",
+        "animations/02-Body_Parts/Show_Hand_Both_01.qianim",
+        null,
 
-        "animations/07-Reactions/NiceReaction_01.qianim",        // Amour (ajout)
-        "animations/01-Hello/Hello_04.qianim",                   // Rose comme un bisou
-        "animations/06-Solitaries/PlayWithHandBoth_01.qianim",   // Cœur chaud, câlin
-        "animations/02-Body_Parts/Show_Hand_Both_01.qianim",     // Tenir la main
-        null,                                                    // Je t’aime
-
-        "animations/05-Enumeration/Enumeration_01.qianim",       // Rangement final
-        null,                                                    // Une couleur pour chaque émotion
-        "animations/07-Reactions/NiceReaction_02.qianim",        // Monstre soulagé
-        null,                                                    // Et vous ?
-        "animations/05-Enumeration/Enumeration_02.qianim"        // Quelle est ta couleur ?
+        "animations/05-Enumeration/Enumeration_01.qianim",
+        null,
+        "animations/07-Reactions/NiceReaction_02.qianim",
+        null,
+        "animations/05-Enumeration/Enumeration_02.qianim"
     )
 
 
@@ -146,7 +145,7 @@ class MonstreDesEmotionsFragment : Fragment(), RobotLifecycleCallbacks {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Enregistrer pour recevoir les callbacks QiSDK
+
         QiSDK.register(requireActivity(), this)
         return inflater.inflate(R.layout.fragment_listen_story, container, false)
     }
@@ -161,12 +160,12 @@ class MonstreDesEmotionsFragment : Fragment(), RobotLifecycleCallbacks {
 
         lifecycleScope.launch(Dispatchers.IO) {
             storyLines.forEachIndexed { index, line ->
-                // Met à jour le texte sur le thread UI
+
                 withContext(Dispatchers.Main) {
                     tvSection.text = line
                 }
 
-                // Lecture de la phrase
+
                 val sayJob = async {
                     SayBuilder.with(context)
                         .withLocale(localeFR)
@@ -175,7 +174,7 @@ class MonstreDesEmotionsFragment : Fragment(), RobotLifecycleCallbacks {
                         .run()
                 }
 
-                // Animation éventuelle
+
                 val animJob = async {
                     animationsByLine.getOrNull(index)?.let { path ->
                         try {
@@ -201,11 +200,11 @@ class MonstreDesEmotionsFragment : Fragment(), RobotLifecycleCallbacks {
     }
 
     override fun onRobotFocusRefused(reason: String?) {
-        // Rien à faire
+
     }
 
     override fun onDestroyView() {
-        // Se désinscrire des callbacks QiSDK
+
         QiSDK.unregister(requireActivity())
         super.onDestroyView()
     }

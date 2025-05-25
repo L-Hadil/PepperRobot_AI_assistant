@@ -52,24 +52,24 @@ class PepperStoryFragment : Fragment(), RobotLifecycleCallbacks {
 
 
     private val animationsByLine = listOf(
-        "animations/01-Hello/Hello_01.qianim",                     // Présentation
-        "animations/07-Reactions/Happy_01.qianim",                 // Content
-        "animations/06-Solitaries/LookHandLeft_01.qianim",         // Parler de Madalina
-        "animations/07-Reactions/NiceReaction_01.qianim",          // Oui oui !
-        "animations/06-Solitaries/Looking_around_01.qianim",       // Voix douce
-        "animations/06-Solitaries/LookLeft_01.qianim",             // Citation
-        "animations/06-Solitaries/LookRight_01.qianim",            // Tourner tête
-        "animations/07-Reactions/Funny_01.qianim",                 // Enthousiasme
-        "animations/02-Body_Parts/Show_Hand_Both_01.qianim",       // Bras robot
-        "animations/07-Reactions/NiceReaction_02.qianim",          // Description des enfants
-        "animations/06-Solitaries/LookHandRight_01.qianim",        // Parler de Hadil
-        "animations/07-Reactions/Success_01.qianim",               // Fort en maths
-        "animations/01-Hello/Hello_03.qianim",                     // Arrivée en classe
-        "animations/07-Reactions/SadReaction_01.qianim",           // Nervosité
-        "animations/06-Solitaries/LookBumpersLeft_01.qianim",      // Première fois
-        "animations/06-Solitaries/LookAtSidesRight_01.qianim",     // Question importante
-        "animations/05-Enumeration/Enumeration_01.qianim",         // Question 1
-        "animations/05-Enumeration/Enumeration_02.qianim"          // Question 2
+        "animations/01-Hello/Hello_01.qianim",
+        "animations/07-Reactions/Happy_01.qianim",
+        "animations/06-Solitaries/LookHandLeft_01.qianim",
+        "animations/07-Reactions/NiceReaction_01.qianim",
+        "animations/06-Solitaries/Looking_around_01.qianim",
+        "animations/06-Solitaries/LookLeft_01.qianim",
+        "animations/06-Solitaries/LookRight_01.qianim",
+        "animations/07-Reactions/Funny_01.qianim",
+        "animations/02-Body_Parts/Show_Hand_Both_01.qianim",
+        "animations/07-Reactions/NiceReaction_02.qianim",
+        "animations/06-Solitaries/LookHandRight_01.qianim",
+        "animations/07-Reactions/Success_01.qianim",
+        "animations/01-Hello/Hello_03.qianim",
+        "animations/07-Reactions/SadReaction_01.qianim",
+        "animations/06-Solitaries/LookBumpersLeft_01.qianim",
+        "animations/06-Solitaries/LookAtSidesRight_01.qianim",
+        "animations/05-Enumeration/Enumeration_01.qianim",
+        "animations/05-Enumeration/Enumeration_02.qianim"
     )
 
 
@@ -129,7 +129,7 @@ class PepperStoryFragment : Fragment(), RobotLifecycleCallbacks {
     }
 
     override fun onRobotFocusRefused(reason: String?) {
-        // rien
+
     }
 
     override fun onDestroyView() {

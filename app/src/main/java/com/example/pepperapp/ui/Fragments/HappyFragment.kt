@@ -37,7 +37,7 @@ class HappyFragment : Fragment(), RobotLifecycleCallbacks {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Enregistre les callbacks QiSDK
+
         QiSDK.register(requireActivity(), this)
         return inflater.inflate(R.layout.fragment_happy, container, false)
     }
@@ -53,7 +53,7 @@ class HappyFragment : Fragment(), RobotLifecycleCallbacks {
     override fun onRobotFocusGained(context: QiContext) {
         qiContext = context
 
-        // 1) parole et animation d'accueil heureuse
+
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val sayJob = async {
@@ -83,7 +83,7 @@ class HappyFragment : Fragment(), RobotLifecycleCallbacks {
             }
         }
 
-        // 2) configurer les capteurs main droite et main gauche
+
         try {
             rightHandSensor = context.touch.getSensor("RHand/Touch").also { sensor ->
                 sensor.addOnStateChangedListener { state ->
@@ -101,7 +101,7 @@ class HappyFragment : Fragment(), RobotLifecycleCallbacks {
     }
 
     override fun onRobotFocusLost() {
-        // Désinscrire les listeners tactiles
+
         rightHandSensor?.removeAllOnStateChangedListeners()
         leftHandSensor?.removeAllOnStateChangedListeners()
         rightHandSensor = null

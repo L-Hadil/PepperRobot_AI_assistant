@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Prénom -->
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
             android:inputType="textPersonName"
             android:layout_marginBottom="12dp" />
 
-        <!-- Âge -->
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
             android:inputType="number"
             android:layout_marginBottom="16dp" />
 
-        <!-- Connaissance de l'histoire -->
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
                 android:layout_marginStart="16dp" />
         </RadioGroup>
 
-        <!-- Zone QCM -->
+
         <TextView
             android:id="@+id/questionText"
             android:layout_width="wrap_content"
@@ -104,7 +104,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp" />
 
-        <!-- Bouton Recommencer -->
+
         <Button
             android:id="@+id/buttonRestart"
             style="@style/Widget.MaterialComponents.Button"

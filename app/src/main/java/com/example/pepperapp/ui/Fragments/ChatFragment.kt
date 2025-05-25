@@ -848,19 +848,19 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
     private var qiContext: QiContext? = null
     private var greeted = false
 
-    // Audio recording
+
     private var recorder: MediaRecorder? = null
     private lateinit var audioFile: File
     private var isRecordingAudio = false
 
-    // OpenAI client
-    private val apiKey = "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"
+
+    private val apiKey = "YOUR_API_KEY"
     private val client = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
         .build()
 
-    // History for chat/completions
+
     private val messageHistory = mutableListOf<JSONObject>()
     private val systemPrompt = """
         Tu es Pepper, un petit robot gentil, joyeux et curieux.
@@ -897,7 +897,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         val view = inflater.inflate(R.layout.fragment_chat, container, false)
         QiSDK.register(requireActivity(), this)
 
-        // Add system prompt at start of history
+
         messageHistory.add(JSONObject().apply {
             put("role", "system")
             put("content", systemPrompt)
@@ -908,6 +908,11 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         questionEditText  = view.findViewById(R.id.editTextQuestion)
         sendButton        = view.findViewById(R.id.buttonSendQuestion)
         micButton         = view.findViewById(R.id.buttonMic)
+        questionEditText.post {
+            questionEditText.requestFocus()
+            showKeyboard()
+        }
+
 
         sendButton.setOnClickListener {
             val text = questionEditText.text.toString().trim()
@@ -1008,7 +1013,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         hideKeyboard()
         addMessageBubble(text, isRobot = false)
 
-        // Ajouter entrée utilisateur à l'historique
+
         messageHistory.add(JSONObject().apply {
             put("role", "user")
             put("content", text)

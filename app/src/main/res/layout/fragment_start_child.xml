@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Image en fond -->
     <ImageView
         android:id="@+id/imageMamouth"
         android:layout_width="match_parent"
@@ -12,7 +11,7 @@
         android:scaleType="centerCrop"
         android:src="@drawable/backgroundmammouth" />
 
-    <!-- Bouton Start par dessus l'image -->
+
     <Button
         android:id="@+id/buttonStart"
         android:layout_width="wrap_content"

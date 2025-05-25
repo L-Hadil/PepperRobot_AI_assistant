@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Image en fond -->
+
     <ImageView
         android:id="@+id/imageBackground"
         android:layout_width="0dp"
@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Bouton BYEBYE (haut droit) -->
+
     <Button
         android:id="@+id/buttonByebye"
         android:layout_width="200dp"
@@ -29,7 +29,6 @@
         android:layout_marginTop="48dp"
         android:layout_marginEnd="16dp" />
 
-    <!-- Bouton COLÈRE (sous BYEBYE) -->
     <Button
         android:id="@+id/buttonColere"
         android:layout_width="200dp"
@@ -55,7 +54,7 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp" />
 
-    <!-- Bouton TRISTESSE (sous PEUR) -->
+
     <Button
         android:id="@+id/buttonSad"
         android:layout_width="200dp"
@@ -68,7 +67,7 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp" />
 
-    <!-- Bouton JOIE (sous TRISTESSE) -->
+
     <Button
         android:id="@+id/buttonHappy"
         android:layout_width="200dp"

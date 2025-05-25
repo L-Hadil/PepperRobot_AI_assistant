@@ -19,17 +19,16 @@ class StorySelectionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Mammouth
+
         view.findViewById<Button>(R.id.buttonMammothStory).setOnClickListener {
             findNavController().navigate(R.id.action_storySelectionFragment_to_listenStoryFragment)
         }
 
-        // Nuage
+
         view.findViewById<Button>(R.id.buttonNuageStory).setOnClickListener {
-            findNavController().navigate(R.id.action_storySelectionFragment_to_nuageFragment)
+            findNavController().navigate(R.id.action_storySelectionFragment_to_monstreDesEmotionsFragment)
         }
 
-        // Pepper
         view.findViewById<Button>(R.id.buttonPepperStory).setOnClickListener {
             findNavController().navigate(R.id.action_storySelectionFragment_to_pepperStoryFragment)
         }

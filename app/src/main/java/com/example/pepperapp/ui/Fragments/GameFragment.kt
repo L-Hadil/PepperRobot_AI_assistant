@@ -100,7 +100,7 @@ class GameFragment : Fragment() {
         val correctLabel = original.options[original.correctIndex].first
         val newCorrectIndex = shuffled.indexOfFirst { it.first == correctLabel }
 
-        // Remplace dans la liste pour garder l’ordre correct
+
         questions = questions.toMutableList().apply {
             this[currentIndex] = Question(original.text, shuffled, newCorrectIndex)
         }

@@ -53,18 +53,18 @@
         android:label="Écouter l’histoire"
         tools:layout="@layout/fragment_listen_story" />
 
-    <!-- 3.b Histoire du Nuage -->
+    <!-- 3.b Histoire du monstre des couleurs -->
     <fragment
-        android:id="@+id/NuageFragment"
+        android:id="@+id/monstreDesEmotionsFragment"
         android:name="com.example.pepperapp.ui.Fragments.MonstreDesEmotionsFragment"
-        android:label="Histoire du Nuage"
+        android:label="Monstre Des Emotions "
         tools:layout="@layout/fragment_listen_story" />
 
     <!-- 3.c Histoire de Pepper -->
     <fragment
         android:id="@+id/pepperStoryFragment"
         android:name="com.example.pepperapp.ui.Fragments.PepperStoryFragment"
-        android:label="Histoire de Pepper"
+        android:label="presentation de Pepper"
         tools:layout="@layout/fragment_listen_story" />
 
     <!-- 3.d Sélection d'histoire -->
@@ -77,8 +77,9 @@
             android:id="@+id/action_storySelectionFragment_to_listenStoryFragment"
             app:destination="@id/listenStoryFragment" />
         <action
-            android:id="@+id/action_storySelectionFragment_to_nuageFragment"
-            app:destination="@id/NuageFragment" />
+            android:id="@+id/action_storySelectionFragment_to_monstreDesEmotionsFragment"
+            app:destination="@id/monstreDesEmotionsFragment" />
+
         <action
             android:id="@+id/action_storySelectionFragment_to_pepperStoryFragment"
             app:destination="@id/pepperStoryFragment" />

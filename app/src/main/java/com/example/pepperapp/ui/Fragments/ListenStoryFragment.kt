@@ -29,7 +29,6 @@ class ListenStoryFragment : Fragment(), RobotLifecycleCallbacks {
     private var qiContext: QiContext? = null
     private val localeFR = Locale(Language.FRENCH, Region.FRANCE)
 
-    // Chaque paragraphe de l'histoire
     private val storyLines = listOf(
         "Mamamouth, et, Papapouth, étaient, très, ennuyés. Depuis, sa, naissance, leur, fils, Helmouth, étai adorable, mais il avait un grave défaut : il n’avait pas de touffe de poils sur sa tête. C’était bien le seul mammouth au crâne lisse comme une bille.",
         "Alors pendant des mois, Mamamouth et Papapouth eurent recours à un stratagème très malin. La nuit, dans les marais, ils déterraient des mottes de terre et de longues herbes folles, qu'ils mettaient sur la tête de leur fiston. De loin, les autres animaux pensaient que Helmouth était parfaitement poilu.",
@@ -51,27 +50,27 @@ class ListenStoryFragment : Fragment(), RobotLifecycleCallbacks {
         "Tenant fermement un caillou très affûté dans son bec rouge, Picpic se mit à raser le dessus de la tête de Mamamouth, de Papapouth et de tous les animaux. (Enfin, tous sauf le lion, car Picpic n’avait pas envie de se faire déchiqueter.) Du coup, très jaloux, tous les mamoutheaux voulurent la même coiffure qu’Helmouth !",
         "Finalement, tout le monde imita Helmouth, qui au départ ne ressemblait soi-disant à rien, et qui, sans le vouloir, avait lancé le top de la mode capillaire ! Helmouth comprit alors que sa différence était devenue sa force."
     )
-    // Animation associée à chaque paragraphe, dans l'ordre
+
     private val animationsByLine = listOf(
-        "animations/07-Reactions/SadReaction_01.qianim",          // 1. Tristesse
-        "animations/BodyParts/Show_Hand_Both_01.qianim",           // 2. Tendresse / Créativité
-        "animations/Solitaries/Funny_01.qianim",                  // 3. Amitié / Détente
-        "animations/Solitaries/Looking_around_01.qianim",         // 4. Surprise / Panique
-        "animations/07-Reactions/SadReaction_02.qianim",          // 5. Gêne / Tristesse
-        "animations/Solitaries/LookFarLeft_01.qianim",            // 6. Colère / Compassion
-        "animations/Orientation/PointFrontL_01.qianim",           // 7. Détermination
-        "animations/Solitaries/LookAtSidesRight_01.qianim",       // 8. Réflexion
-        "animations/Solitaries/Funny_02.qianim",                  // 9. Humour
-        "animations/Solitaries/LookHandRight_01.qianim",          // 10. Humour
-        "animations/Solitaries/LookRight_01.qianim",              // 11. Frustration / Humour
-        "animations/Solitaries/LookBumpersRight_01.qianim",       // 12. Humour
-        "animations/Attract/Attract_R03.qianim",                  // 13. Légèreté / Drôle
-        "animations/Back_to_stand/Back_to_stand_03.qianim",       // 14. Respect / Tension
-        "animations/Make_space/Make_Space_02.qianim",             // 15. Colère / Ras-le-bol
-        "animations/Hello/Hello_05.qianim",                       // 16. Réconfort / Amour
-        "animations/Enumeration/Enumeration_01.qianim",           // 17. Détermination positive
-        "animations/07-Reactions/NiceReaction_01.qianim",         // 18. Surprise / Joie
-        "animations/07-Reactions/NiceReaction_02.qianim"          // 19. Fierté / Accomplissement
+        "animations/07-Reactions/SadReaction_01.qianim",
+        "animations/BodyParts/Show_Hand_Both_01.qianim",
+        "animations/Solitaries/Funny_01.qianim",
+        "animations/Solitaries/Looking_around_01.qianim",
+        "animations/07-Reactions/SadReaction_02.qianim",
+        "animations/Solitaries/LookFarLeft_01.qianim",
+        "animations/Orientation/PointFrontL_01.qianim",
+        "animations/Solitaries/LookAtSidesRight_01.qianim",
+        "animations/Solitaries/Funny_02.qianim",
+        "animations/Solitaries/LookHandRight_01.qianim",
+        "animations/Solitaries/LookRight_01.qianim",
+        "animations/Solitaries/LookBumpersRight_01.qianim",
+        "animations/Attract/Attract_R03.qianim",
+        "animations/Back_to_stand/Back_to_stand_03.qianim",
+        "animations/Make_space/Make_Space_02.qianim",
+        "animations/Hello/Hello_05.qianim",
+        "animations/Enumeration/Enumeration_01.qianim",
+        "animations/07-Reactions/NiceReaction_01.qianim",
+        "animations/07-Reactions/NiceReaction_02.qianim"
     )
 
 
@@ -136,7 +135,7 @@ class ListenStoryFragment : Fragment(), RobotLifecycleCallbacks {
     }
 
     override fun onRobotFocusRefused(reason: String?) {
-        // nothing
+
     }
 
     override fun onDestroyView() {
