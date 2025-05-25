@@ -2,7 +2,7 @@
   <img src="./doc/iconpepper.png" width="40%" alt="YourBestFriendPepper logo">
 </div>
 
-# 🤖 YourBestFriendPepper
+# YourBestFriendPepper
 
 > **Study and Research Project (TER) – Master 1 Computer Science – HAI823I – 2024‑2025**
 > **University of Montpellier**
@@ -12,14 +12,14 @@
 
 ---
 
-## 🧒 Target Audience
+## Target Audience
 
 * **Age Range:** 3 – 6 years
 * **Settings:** kindergartens, educational workshops, child–robot mediation
 
 ---
 
-## 🎯 Educational Goals
+##  Educational Goals
 
 | Goal                      | Description                                                            |
 | ------------------------- | ---------------------------------------------------------------------- |
@@ -37,7 +37,7 @@ This question guides the experimental study described in the TER report. The pre
 
 ---
 
-## 🚀 User Flow
+## User Flow
 
 1. **Welcome Screen:** illustration + **Start** button.
 2. **Main Menu:** four features — Listen to a story • Emotion interaction • Talk with Pepper (ChatGPT) • Comprehension quiz.
@@ -99,7 +99,7 @@ This question guides the experimental study described in the TER report. The pre
 
 ---
 
-## 📝 Code Structure
+## Code Structure
 
 ```
 app/
