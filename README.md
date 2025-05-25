@@ -68,10 +68,9 @@ This question guides the experimental study described in the TER report. The pre
 ## ⚡ Setup & Requirements
 
 1. **OpenAI API Key:** add your key in `src/main/java/com/example/pepperapp/ui/Fragments/ChatFragment.kt` at line 54.
-2. **Robot Version:** ensure that Pepper is running **NAOqi 2.9** (Settings → Device Info).
-3. **Start Pepper:** press the button under the screen **once** to boot.
-4. **Network:** connect Pepper and your laptop to the same Wi‑Fi or mobile hotspot.
-5. **ADB Connection:** pull down Pepper’s notification bar to get the IP address, then:
+2. **Start Pepper:** press the button under the screen **once** to boot.
+3. **Network:** connect Pepper and your laptop to the same Wi‑Fi or mobile hotspot.
+4. **ADB Connection:** pull down Pepper’s notification bar to get the IP address, then:
 
    ```bash
    adb connect <PEPPER_IP>:5555
