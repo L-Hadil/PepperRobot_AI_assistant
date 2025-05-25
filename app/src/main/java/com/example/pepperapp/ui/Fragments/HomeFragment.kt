@@ -17,7 +17,7 @@ class HomeFragment : Fragment() {
     private lateinit var btnWelcomeBack: Button
     private var qiContext: QiContext? = null
 
-    // Cette méthode est appelée depuis MainActivity pour transmettre le QiContext
+
     fun setQiContext(context: QiContext) {
         this.qiContext = context
     }

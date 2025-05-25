@@ -28,10 +28,10 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
     private var qiContext: QiContext? = null
     private lateinit var userName: String
 
-    // ATTENTION : en production, gérez votre clé API de façon sécurisée.
-    private val apiKey = "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"
 
-    // Client OkHttp avec délais étendus
+    private val apiKey = "Your_API_Key"
+
+
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
@@ -44,7 +44,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
     private lateinit var sendButton: Button
 
     private var latestQuestion: String = ""
-    // Le thread pour la conversation (créé ou récupéré) est stocké ici et utilisé tout au long de l'échange.
+
     private var threadIdGPT = ""
 
     private val storyParagraphs = listOf(
@@ -81,7 +81,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
                 questionEditText.text.clear()
                 hideKeyboard()
                 lifecycleScope.launch {
-                    Log.d(TAG, "📌 threadId utilisé pour la requête: $threadIdGPT")
+                    Log.d(TAG, " threadId utilisé pour la requête: $threadIdGPT")
                     val response = sendToGPT(threadIdGPT, latestQuestion)
                     speak(response)
                     addMessageBubble(response, isRobot = true)
@@ -91,7 +91,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
             }
         }
 
-        // Initialisation du thread GPT et narration de l'histoire
+
         lifecycleScope.launch {
             val db = PepperDatabase.getDatabase(requireContext())
             val user = db.userProfileDao().getUserByName(userName)
@@ -110,7 +110,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
                 newThreadId
             }
 
-            Log.d(TAG, "📢 Démarrage de l'histoire...")
+            Log.d(TAG, " Démarrage de l'histoire...")
             speak("Bonjour $userName ! Installe-toi bien, je vais te raconter une histoire.") {
                 lifecycleScope.launch {
                     delay(1000)
@@ -119,7 +119,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
                             Log.e(TAG, "❌ QiContext perdu, arrêt de la narration.")
                             break
                         }
-                        Log.d(TAG, "📖 Robot raconte: $line")
+                        Log.d(TAG, " Robot raconte: $line")
                         try {
                             withContext(Dispatchers.IO) {
                                 val say = SayBuilder.with(qiContext)
@@ -222,7 +222,7 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
         super.onDestroyView()
     }
 
-    // --- Intégration de l'API OpenAI ---
+
 
     /**
      * Crée un nouveau thread côté OpenAI.
@@ -266,11 +266,11 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
                 .build()
         ).execute()
 
-        // 2) Démarrer un run (sans transmettre de champs "instructions" supplémentaires)
+
         val assistantId = "asst_7NjhZUtxhimBgCClZphdeQqS"
         val runObject = JSONObject().apply {
             put("assistant_id", assistantId)
-            // Ne pas ajouter de "instructions" pour éviter d'envoyer le contexte système inutilement.
+
         }
         val runRes = client.newCall(
             Request.Builder()
@@ -286,12 +286,12 @@ class ChatFragment : Fragment(), RobotLifecycleCallbacks {
 
         val runJson = JSONObject(runBody ?: "{}")
         val runId = runJson.optString("id", "")
-        // IMPORTANT : NE PAS mettre à jour le threadId. On utilise toujours celui déjà créé.
+
         if (runId.isEmpty()) {
             return@withContext "Échec du run : Aucune 'id' dans la réponse."
         }
 
-        // 3) Polling : attendre que le run soit complété (statut "completed")
+
         repeat(30) {
             delay(1000)
             val check = client.newCall(
