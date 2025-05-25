@@ -49,6 +49,7 @@ This question guides the experimental study described in the TER report. The pre
 4. **Emotion Interaction:** child picks an emotion (joy, sadness, anger, fear) → Pepper plays an animation and waits for touch sensors. A **Bye‑bye** button ends the session.
 5. **Free Dialogue:** Pepper, powered by the ChatGPT API, answers children’s questions in his own persona.
 6. **Quiz:** multiple‑choice questions to validate understanding of the story and emotions.
+<img src="./doc/Pepper-Enfant TER.png" width="80%" alt="YourBestFriendPepper screen flow">
 
 ---
 
