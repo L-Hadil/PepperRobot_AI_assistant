@@ -36,7 +36,15 @@
             android:id="@+id/action_chooseFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
 
+        <action
+            android:id="@+id/action_chooseFragment_to_gameFragment"
+            app:destination="@id/gameFragment" />
     </fragment>
+    <!-- Fragment de jeu -->
+    <fragment
+        android:id="@+id/gameFragment"
+        android:name="com.example.pepperapp.ui.Fragments.GameFragment"
+        android:label="Jeu" />
 
     <!-- 3.a Écouter l’histoire -->
     <fragment
@@ -94,6 +102,9 @@
         <action
             android:id="@+id/action_interactionsFragment_to_goodbyeFragment"
             app:destination="@id/goodbyeFragment" />
+        <action
+            android:id="@+id/action_interactionsFragment_to_colerefragment"
+            app:destination="@id/colereFragment" />
     </fragment>
 
     <!-- 5. Fragments d’émotions -->
@@ -117,6 +128,11 @@
         android:name="com.example.pepperapp.ui.Fragments.GoodbyeFragment"
         android:label="Goodbye"
         tools:layout="@layout/fragment_goodbye" />
+    <fragment
+         android:id="@+id/colereFragment"
+           android:name="com.example.pepperapp.ui.Fragments.ColereFragment"
+           android:label="Colère"
+        />
 
 
     <fragment

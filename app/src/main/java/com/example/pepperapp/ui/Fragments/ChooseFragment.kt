@@ -48,7 +48,9 @@ class ChooseFragment : Fragment() {
 
         }
 
-
+        view.findViewById<Button>(R.id.buttonPlayGame).setOnClickListener {
+            findNavController().navigate(R.id.action_chooseFragment_to_gameFragment)
+        }
         view.findViewById<Button>(R.id.buttonInteractions).setOnClickListener {
             findNavController().navigate(R.id.action_chooseFragment_to_interactionsFragment)
         }

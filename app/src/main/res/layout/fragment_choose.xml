@@ -5,6 +5,8 @@
     android:layout_height="match_parent">
 
     <!-- Image en fond -->
+
+    <!-- Colonne de boutons par-dessus -->
     <ImageView
         android:id="@+id/imageMamouthChoose"
         android:layout_width="match_parent"
@@ -12,51 +14,63 @@
         android:scaleType="centerCrop"
         android:src="@drawable/backgroundmammouth2" />
 
-    <!-- Colonne de boutons par-dessus -->
     <LinearLayout
         android:id="@+id/buttonContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|center_vertical"
-        android:orientation="vertical"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="48dp"
         android:gravity="center"
-        android:layout_marginEnd="32dp">
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/buttonListenStory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ecouter l’histoire"
-            android:background="@drawable/button_background"
-            android:textColor="#000000"
-            android:textStyle="bold"
             android:layout_marginBottom="16dp"
+            android:background="@drawable/button_background"
             android:minWidth="200dp"
-            android:minHeight="64dp" />
+            android:minHeight="64dp"
+            android:text="Ecouter l’histoire"
+            android:textColor="#000000"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/buttonInteractions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Interactions"
-            android:background="@drawable/button_background"
-            android:textColor="#000000"
-            android:textStyle="bold"
             android:layout_marginBottom="16dp"
+            android:background="@drawable/button_background"
             android:minWidth="200dp"
-            android:minHeight="64dp" />
+            android:minHeight="64dp"
+            android:text="Interactions"
+            android:textColor="#000000"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/buttonChatGptFeedback"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chat-GPT feedback"
             android:background="@drawable/button_background"
-            android:textColor="#000000"
-            android:textStyle="bold"
+            android:layout_marginBottom="16dp"
             android:minWidth="200dp"
-            android:minHeight="64dp" />
+            android:minHeight="64dp"
+            android:text="Chat-GPT feedback"
+            android:textColor="#000000"
+            android:textStyle="bold" />
 
+        <Button
+            android:id="@+id/buttonPlayGame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/button_background"
+            android:minWidth="200dp"
+            android:minHeight="64dp"
+            android:text="Questionnaire"
+            android:textColor="#000000"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </FrameLayout>

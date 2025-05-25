@@ -25,16 +25,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
-class HugFragment : Fragment(), RobotLifecycleCallbacks {
-
-    companion object {
-        private const val TAG = "HugFragment"
-    }
+class ColereFragment : Fragment(), RobotLifecycleCallbacks {
 
     private var qiContext: QiContext? = null
     private var headSensor: TouchSensor? = null
-    private var rightHandSensor: TouchSensor? = null
-    private var leftHandSensor: TouchSensor? = null
     private val localeFR = Locale(Language.FRENCH, Region.FRANCE)
 
     override fun onCreateView(
@@ -44,12 +38,14 @@ class HugFragment : Fragment(), RobotLifecycleCallbacks {
     ): View {
         // S'enregistrer pour recevoir les callbacks QiSDK
         QiSDK.register(requireActivity(), this)
-        return inflater.inflate(R.layout.fragment_hug, container, false)
+        return inflater.inflate(R.layout.fragment_colere, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.findViewById<Button>(R.id.buttonBack)?.setOnClickListener {
+
+        // Retour
+        view.findViewById<Button>(R.id.buttonBack).setOnClickListener {
             findNavController().popBackStack()
         }
     }
@@ -57,63 +53,54 @@ class HugFragment : Fragment(), RobotLifecycleCallbacks {
     override fun onRobotFocusGained(context: QiContext) {
         qiContext = context
 
-        // 1) Invitation au câlin
+        // 1) jouer l'émotion triste
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                SayBuilder.with(context)
-                    .withLocale(localeFR)
-                    .withText("Je me sens comme le monstre gris… j’ai un peu peur et un petit coup de mou. " +
-                            "Est-ce que je pourrais avoir un gros câlin ? Viens me serrer fort, s’il te plaît… j’en ai bien besoin."
-                    )
-                    .build().run()
-
-                val anim = AnimationBuilder.with(context)
-                    .withAssets("animations/01-Hello/Hello_02.qianim")
-                    .build()
-                AnimateBuilder.with(context)
-                    .withAnimation(anim)
-                    .build()
-                    .run()
+                val sayJob = async {
+                    SayBuilder.with(context)
+                        .withLocale(localeFR)
+                        .withText("je me sens en colère, comme le monstre rouge. Mon cœur bouillonne et j’ai envie de crier… Tu peux me prendre dans tes bras pour m’aider à me calmer, s’il te plaît ?"
+                        )
+                        .build()
+                        .run()
+                }
+                val animJob = async {
+                    val anim: Animation = AnimationBuilder.with(context)
+                        .withAssets("animations/07-Reactions/SadReaction_01.qianim")
+                        .build()
+                    AnimateBuilder.with(context)
+                        .withAnimation(anim)
+                        .build()
+                        .run()
+                }
+                sayJob.await()
+                animJob.await()
             } catch (e: Exception) {
-                Log.e(TAG, "Erreur invitation câlin", e)
+                Log.e("SadFragment", "Erreur playSadEmotion", e)
             }
         }
 
-        // 2) Configurer les capteurs Head, main droite et main gauche
+        // 2) configurer le capteur tête
         try {
             headSensor = context.touch.getSensor("Head/Touch").also { sensor ->
                 sensor.addOnStateChangedListener { state ->
-                    if (state.touched) respondHug()
-                }
-            }
-            rightHandSensor = context.touch.getSensor("RHand/Touch").also { sensor ->
-                sensor.addOnStateChangedListener { state ->
-                    if (state.touched) respondHug()
-                }
-            }
-            leftHandSensor = context.touch.getSensor("LHand/Touch").also { sensor ->
-                sensor.addOnStateChangedListener { state ->
-                    if (state.touched) respondHug()
+                    if (state.touched) respondHappy()
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Service Touch indisponible", e)
+            Log.e("SadFragment", "Service Touch indisponible", e)
         }
     }
 
     override fun onRobotFocusLost() {
-        // Désinscrire les listeners pour éviter les fuites
+        // désinscrire le listener tactile
         headSensor?.removeAllOnStateChangedListeners()
-        rightHandSensor?.removeAllOnStateChangedListeners()
-        leftHandSensor?.removeAllOnStateChangedListeners()
         headSensor = null
-        rightHandSensor = null
-        leftHandSensor = null
         qiContext = null
     }
 
     override fun onRobotFocusRefused(reason: String?) {
-        Log.w(TAG, "Focus refusé: $reason")
+        Log.w("SadFragment", "Focus refusé: $reason")
     }
 
     override fun onDestroyView() {
@@ -121,17 +108,17 @@ class HugFragment : Fragment(), RobotLifecycleCallbacks {
         super.onDestroyView()
     }
 
-    private fun respondHug() {
+    private fun respondHappy() {
         val ctx = qiContext ?: return
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 SayBuilder.with(ctx)
                     .withLocale(localeFR)
-                    .withText("quel câlin chaleureux ! Merci beaucoup, je me sens tout léger maintenant !")
+                    .withText("oh merci je sens la joie je suis jaune comme la joie  Merci ! ")
                     .build()
                     .run()
             } catch (e: Exception) {
-                Log.e(TAG, "Erreur respondHug", e)
+                Log.e("SadFragment", "Erreur respondHappy", e)
             }
         }
     }

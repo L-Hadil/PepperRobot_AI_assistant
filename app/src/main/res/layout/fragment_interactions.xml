@@ -6,7 +6,7 @@
 
     <!-- Image en fond -->
     <ImageView
-        android:id="@+id/imageSadBackground"
+        android:id="@+id/imageBackground"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
@@ -29,7 +29,20 @@
         android:layout_marginTop="48dp"
         android:layout_marginEnd="16dp" />
 
-    <!-- Bouton PEUR -->
+    <!-- Bouton COLÈRE (sous BYEBYE) -->
+    <Button
+        android:id="@+id/buttonColere"
+        android:layout_width="200dp"
+        android:layout_height="64dp"
+        android:background="@drawable/button_background"
+        android:text="COLÈRE"
+        android:textColor="#000"
+        app:layout_constraintTop_toBottomOf="@id/buttonByebye"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"
+    android:layout_marginEnd="16dp" />
+
+    <!-- Bouton PEUR (sous COLÈRE) -->
     <Button
         android:id="@+id/buttonHug"
         android:layout_width="200dp"
@@ -37,12 +50,12 @@
         android:background="@drawable/button_background"
         android:text="PEUR"
         android:textColor="#000"
-        app:layout_constraintTop_toBottomOf="@id/buttonByebye"
+        app:layout_constraintTop_toBottomOf="@id/buttonColere"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp" />
 
-    <!-- Bouton TRISTESSE -->
+    <!-- Bouton TRISTESSE (sous PEUR) -->
     <Button
         android:id="@+id/buttonSad"
         android:layout_width="200dp"
@@ -52,10 +65,10 @@
         android:textColor="#000"
         app:layout_constraintTop_toBottomOf="@id/buttonHug"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp" />
 
-    <!-- Bouton JOIE (plus bas) -->
+    <!-- Bouton JOIE (sous TRISTESSE) -->
     <Button
         android:id="@+id/buttonHappy"
         android:layout_width="200dp"
@@ -65,7 +78,7 @@
         android:textColor="#000"
         app:layout_constraintTop_toBottomOf="@id/buttonSad"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

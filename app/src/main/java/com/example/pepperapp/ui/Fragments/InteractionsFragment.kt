@@ -35,5 +35,8 @@ class InteractionsFragment : Fragment() {
   view.findViewById<Button>(R.id.buttonByebye).setOnClickListener {
       findNavController().navigate(R.id.goodbyeFragment)
   }
+        view.findViewById<Button>(R.id.buttonColere).setOnClickListener {
+                        findNavController().navigate(R.id.colereFragment)
+                }
     }
 }

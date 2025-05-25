@@ -9,4 +9,14 @@
 
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- Couleurs essentielles supplémentaires -->
+    <color name="rouge">#C62828</color> <!-- Rouge vif -->
+    <color name="bleu">#1565C0</color> <!-- Bleu pur -->
+    <color name="vert">#558B2F</color> <!-- Vert pur -->
+    <color name="jaune">#FBC02D</color> <!-- Jaune vif -->
+    <color name="gris">#808080</color> <!-- Gris moyen -->
+    <color name="noir">#000000</color>
+    <color name="purple_700">#6A1B9A</color>
+    <color name="rose">#AD1457</color> <!-- Noir pur -->
+
 </resources>

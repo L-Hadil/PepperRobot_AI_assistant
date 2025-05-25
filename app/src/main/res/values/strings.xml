@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">pepperRobot-AI-assistant</string>
+
+        <string name="label_child_name">Prénom de l\'enfant</string>
+        <string name="hint_child_name">Ex : Lina</string>
+        <string name="label_child_age">Âge de l\'enfant</string>
+        <string name="hint_child_age">Ex : 4</string>
+        <string name="label_known_story">Connais-tu l\'histoire du Monstre des Couleurs ?</string>
+        <string name="yes">Oui</string>
+        <string name="no">Non</string>
+
+
 </resources>

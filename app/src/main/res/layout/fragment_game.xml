@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Prénom -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Prénom de l'enfant"
+            android:textStyle="bold"
+            android:textColor="@color/noir"/>
+        <EditText
+            android:id="@+id/editTextName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ex : Lina"
+            android:inputType="textPersonName"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Âge -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Âge de l'enfant"
+            android:textStyle="bold"
+            android:textColor="@color/noir"/>
+        <EditText
+            android:id="@+id/editTextAge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ex : 4"
+            android:inputType="number"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Connaissance de l'histoire -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Connais-tu l'histoire du Monstre des Couleurs ?"
+            android:textStyle="bold"
+            android:textColor="@color/noir"
+            android:layout_marginBottom="8dp" />
+        <RadioGroup
+            android:id="@+id/radioGroupKnown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="24dp">
+            <RadioButton
+                android:id="@+id/radioKnownYes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Oui" />
+            <RadioButton
+                android:id="@+id/radioKnownNo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Non"
+                android:layout_marginStart="16dp" />
+        </RadioGroup>
+
+        <!-- Zone QCM -->
+        <TextView
+            android:id="@+id/questionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/noir"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/optionA"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/optionB"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/optionC"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/optionD"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Bouton Recommencer -->
+        <Button
+            android:id="@+id/buttonRestart"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Recommencer"
+            android:textStyle="bold"
+            android:textColor="@color/white"/>
+    </LinearLayout>
+</ScrollView>

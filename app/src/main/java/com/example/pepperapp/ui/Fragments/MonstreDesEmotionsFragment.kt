@@ -59,12 +59,12 @@ class MonstreDesEmotionsFragment : Fragment(), RobotLifecycleCallbacks {
         "Quand vous êtes en colère, vous faites quoi ?",
 
         "Après, il y a la peur.",
-        "Elle est noire comme la nuit.",
-        "C’est quand tu as peur du noir, ou que tu crois qu’il y a un monstre sous ton lit… même si ce n’est pas vrai.",
+        "Elle est grise comme un orage.",
+        "C’est quand tu crois qu’il y a un monstre sous ton lit… même si ce n’est pas vrai.",
         "La peur te fait tout petit, comme une souris.",
         "Moi, j’ai déjà eu peur d’un aspirateur ! Et vous ?",
 
-        "Et ensuite… il y a le calme.",
+        "Et ensuite… il y a la sérinité.",
         "Il est vert, comme les feuilles d’un arbre.",
         "C’est quand tu es bien, que tu respires doucement, que tu écoutes une histoire.",
         "Le calme, c’est doux comme un câlin.",
@@ -76,7 +76,7 @@ class MonstreDesEmotionsFragment : Fragment(), RobotLifecycleCallbacks {
         "L’amour, c’est quand tu fais un câlin, ou que tu tiens la main de quelqu’un.",
         "Et vous ? À qui avez-vous envie de dire 'je t’aime' aujourd’hui ?",
 
-        "Alors le monstre a tout rangé.",
+        "Alors le monstre a tout rangé",
         "Une couleur pour chaque émotion.",
         "Et maintenant, il se sent bien. Il comprend ce qui se passe en lui.",
         "Et vous, les enfants ?",
