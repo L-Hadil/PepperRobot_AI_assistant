@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">pepperRobot-AI-assistant</string>
+    <string name="app_name">YourBestFriendPepper</string>
 
         <string name="label_child_name">Prénom de l\'enfant</string>
         <string name="hint_child_name">Ex : Lina</string>
